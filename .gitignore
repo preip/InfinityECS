@@ -50,3 +50,5 @@ build/
 
 ## OS Specific
 .DS_Store
+/.nb-gradle/profiles/private/
+/.nb-gradle/private/
