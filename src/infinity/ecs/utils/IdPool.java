@@ -41,17 +41,17 @@ public class IdPool {
 	 * Used to determine the next unique ID if there are no free IDs, which
 	 * can be distributed first. 
 	 */
-	int _idCount;
+	private int _idCount; //TODO: Something to capture the integer overflow.
 	/**
 	 * Array that is used as a stack and contains all IDs that was have been
 	 * freed and can therefore be reused.
 	 */
-	int[] _freeIds;
+	private int[] _freeIds;
 	/**
 	 * Points to the current position an the stack of free IDs. A value of -1
 	 * means there are currently no free IDs.
 	 */
-	int _freeIdsPointer;
+	private int _freeIdsPointer;
 	
 	/**
 	 * Creates a new instance of the IdPool class. The capacity of the stack for free IDs
