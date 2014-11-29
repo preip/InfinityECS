@@ -1,6 +1,8 @@
 package infinity.ecs.core;
 
 import infinity.ecs.utils.BitArray;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Can be used to create a mask that resembles a group of several components.
@@ -23,23 +25,40 @@ import infinity.ecs.utils.BitArray;
  * @version 1.0
  */
 public class ComponentMask {
-	private BitArray _bitArray;
+	private final BitArray _bitArray;
 	
 	public ComponentMask() {
 		_bitArray = new BitArray();
 	}
-	
+	      
 	public ComponentMask(ComponentType... componentTypes) {
 		_bitArray = new BitArray();
 		set(componentTypes);
 	}
+        
+        public ComponentMask(Collection<ComponentType> componentTypes) {
+            _bitArray = new BitArray();
+            set(componentTypes);
+        }
+        
+        final void set(Collection<ComponentType> componentTypes) {
+            Iterator<ComponentType> iter = componentTypes.iterator();
+            while(iter.hasNext())
+                _bitArray.set(iter.next().getId(), true);
+        }
+        
+        final void clear(Collection<ComponentType> componentTypes) {
+            Iterator<ComponentType> iter = componentTypes.iterator();
+            while(iter.hasNext())
+                _bitArray.set(iter.next().getId(), false);            
+        }
 	
-	void set(ComponentType... componentTypes) {
+	final void set(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
 			_bitArray.set(componentType.getId(), true);
 	}
 	
-	void clear(ComponentType... componentTypes) {
+	final void clear(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
 			_bitArray.set(componentType.getId(), false);
 	}

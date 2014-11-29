@@ -4,7 +4,7 @@ import infinity.ecs.utils.IdPool;
 
 public class EntityManager {
 	
-	private IdPool _idPool;
+	private final IdPool _idPool;
 	
 	public EntityManager() {
 		_idPool = new IdPool();
