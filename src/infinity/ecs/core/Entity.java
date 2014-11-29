@@ -4,8 +4,9 @@ public class Entity {
 	private final int _id;
 	
 	/**
-	 * Package private constructor, which initializes the entity with the specified id.
-	 * Can't be public, or IDs were no longer be guaranteed to be unique.
+	 * Package private constructor, which initializes the entity with the 
+         * specified id. Can't be public, or IDs were no longer be guaranteed 
+         * to be unique
 	 * @param id
 	 */
 	Entity(int id) {

@@ -3,15 +3,23 @@ package infinity.ecs.core;
 import java.util.Iterator;
 import java.util.HashMap;
 
+/**
+ * ComponentType hold a unique for the type of a Component and some static 
+ * utility functions for getting the specific id of the ComponentType of a
+ * Component
+ */
+
 public final class ComponentType {
 	/**
 	 * Contains all current componentTypes indexed by their class.
 	 */
-	private static HashMap<Class<? extends Component>, ComponentType> _classLib = new HashMap<Class<? extends Component>, ComponentType>();
+	private static final HashMap<Class<? extends Component>, ComponentType> 
+                _classLib = new HashMap<>();
 	
 	/**
 	 * Gets the ComponentType based on the specified Component class.
-	 * @param typeClass The Component class for this the ComponentType should be got.
+	 * @param typeClass The Component class for this the ComponentType 
+         * should be got.
 	 * @return The resulting ComponentType.
 	 */
 	public static ComponentType get(Class<? extends Component> typeClass) {
@@ -86,7 +94,8 @@ public final class ComponentType {
 	 */
 	@Override
 	public int hashCode() {
-		// the has code is just the id. This should make sure, every componenetType is different from
+		// the has code is just the id. This should make sure, 
+                // every componenetType is different from
 		// each other
 		return _id;
 	}

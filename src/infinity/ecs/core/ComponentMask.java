@@ -7,15 +7,17 @@ import infinity.ecs.utils.BitArray;
  * Can be compared to other masks to find matches etc.
  * <p>
  * <b>Notes:</b><br>
- * Tight wrapper around {@link BitArray} class. Should be used by Entities and Systems to
- * check if the requirements from to Systems to the Entities are matched.
+ * Tight wrapper around {@link BitArray} class. Should be used by Entities and 
+ * Systems to check if the requirements from to Systems to the Entities are 
+ * matched.
  * <p>
- * Manipulation of the masks after their initial creation is only allowed by core
- * members. This enables entities to quickly alter their masks if the gain or
- * loose components without the need to create a completely new mask.
- * Manipulation is not exposed outside of the core so prevent other objects changing
- * the mask of an entity in a way, that results in an invalid state, because the
- * mask no longer resembles the components that entity contains.
+ * Manipulation of the masks after their initial creation is only allowed by 
+ * core members. This enables entities to quickly alter their masks if the 
+ * gain or loose components without the need to create a completely new mask.
+ * 
+ * Manipulation is not exposed outside of the core so prevent other objects 
+ * changing the mask of an entity in a way, that results in an invalid state, 
+ * because the mask no longer resembles the components that entity contains.
  * 
  * @author preip
  * @version 1.0
@@ -44,7 +46,8 @@ public class ComponentMask {
 	/**
 	 * Checks, if the component mask contains all specified ComponentTypes.
 	 * @param componentTypes The ComponentTypes which should be checked.
-	 * @return true if the mask contains all specified types, otherwise false.
+	 * @return true if the mask contains all specified types, otherwise 
+         * false.
 	 */
 	public boolean contains(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
