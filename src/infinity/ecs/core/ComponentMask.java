@@ -21,11 +21,19 @@ import java.util.Iterator;
  * changing the mask of an entity in a way, that results in an invalid state, 
  * because the mask no longer resembles the components that entity contains.
  * 
- * @author preip
+ * @author preip, Simon
  * @version 1.0
  */
 public class ComponentMask {
 	private final BitArray _bitArray;
+	
+	/**
+	 * Copy constructor.
+	 * @param copy The componentMask which should be cloned.
+	 */
+	public ComponentMask(ComponentMask copy) {
+		_bitArray = copy._bitArray.clone();
+	}
 	
 	public ComponentMask() {
 		_bitArray = new BitArray();
@@ -36,22 +44,22 @@ public class ComponentMask {
 		set(componentTypes);
 	}
         
-        public ComponentMask(Collection<ComponentType> componentTypes) {
-            _bitArray = new BitArray();
-            set(componentTypes);
-        }
+    public ComponentMask(Collection<ComponentType> componentTypes) {
+        _bitArray = new BitArray();
+        set(componentTypes);
+    }
         
-        final void set(Collection<ComponentType> componentTypes) {
-            Iterator<ComponentType> iter = componentTypes.iterator();
-            while(iter.hasNext())
-                _bitArray.set(iter.next().getId(), true);
-        }
+    final void set(Collection<ComponentType> componentTypes) {
+        Iterator<ComponentType> iter = componentTypes.iterator();
+        while(iter.hasNext())
+            _bitArray.set(iter.next().getId(), true);
+    }
         
-        final void clear(Collection<ComponentType> componentTypes) {
-            Iterator<ComponentType> iter = componentTypes.iterator();
-            while(iter.hasNext())
-                _bitArray.set(iter.next().getId(), false);            
-        }
+    final void clear(Collection<ComponentType> componentTypes) {
+        Iterator<ComponentType> iter = componentTypes.iterator();
+        while(iter.hasNext())
+            _bitArray.set(iter.next().getId(), false);            
+    }
 	
 	final void set(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)

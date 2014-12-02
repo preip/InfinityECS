@@ -1,13 +1,63 @@
 package infinity.ecs.core;
 
-import infinity.ecs.utils.IdPool;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
+import infinity.ecs.utils.IdPool;
+import infinity.ecs.utils.ReadOnlyCollection;
+
+/**
+ * Class which manages a set of entities. It can be used to create new entities with unique IDs,
+ * add new components to an entity, get lists of entities which match a specific component mask
+ * etc.  
+ * 
+ * @author preip
+ * @version 0.1
+ */
 public class EntityManager {
-	
+	/**
+	 * The IdPool used by this entity manager to generate IDs for new entities.
+	 */
 	private final IdPool _idPool;
+	/**
+	 * The list of all entities managed by this EntityManager indexed by their IDs. 
+	 */
+	private final HashMap<Integer, Entity> _entities;
+	/**
+	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
+	 */
+	private final HashMap<ComponentMask, ArrayList<Entity>> _entitiesByMask;
 	
+	/**
+	 * Creates a new instance of the EntityManager class.
+	 */
 	public EntityManager() {
 		_idPool = new IdPool();
+		_entities = new HashMap<Integer, Entity>();
+		_entitiesByMask = new HashMap<ComponentMask, ArrayList<Entity>>();
+	}
+	
+	/**
+	 * Creates a list of all entities that contain the specified component mask.
+	 * NOTE: The list is only created and not added to anything.
+	 * @param mask The mask for which the list should be created.
+	 * @return The resulting list of entities that contain the mask.
+	 */
+	private ArrayList<Entity> createNewEntityListByMask(ComponentMask mask) {
+		ArrayList<Entity> result = new ArrayList<Entity>();
+		// NOTE: According to some random benchmarks on the Internet, iterating over the entry sets
+		// is faster than iterating over the sources only. Thats why the whole set is used, but
+		// the key is of no interest for the operation.
+		Iterator<Entry<Integer, Entity>> it = _entities.entrySet().iterator();
+		while(it.hasNext()) {
+			Entity entity = it.next().getValue();
+			// check for each entry, if its components match the specified mask
+			if (entity.getComponentMask().contains(mask))
+				result.add(entity);
+		}
+		return result;
 	}
 	
 	/**
@@ -15,8 +65,37 @@ public class EntityManager {
 	 * @return The created Entity.
 	 */
 	public Entity createEntity() {
-		Entity entity = new Entity(_idPool.getId());
-		
+		int id = _idPool.getId();
+		Entity entity = new Entity(id);
+		_entities.put(id, entity);
 		return entity;
+	}
+	/**
+	 * Gets all entities that contain the components defined by the specified mask.
+	 * @param mask The mask for which an entity list should be got.
+	 * @return The resulting list of entities which match the mask.
+	 */
+	public ReadOnlyCollection<Entity> getMatchingEntities(ComponentMask mask) {
+		// try to get the entity list from the stored ones
+		ArrayList<Entity> list = _entitiesByMask.get(mask);
+		// if a query for the specified mask was not already in storage, create a new one and
+		// save it for further queries
+		if (list == null) {
+			list = createNewEntityListByMask(mask);
+			// Clone the mask, so changes to the original mask won't change the index mask
+			// (which would probably screw up the index)
+			_entitiesByMask.put(new ComponentMask(mask), list);
+		}
+		// finally, return not the list itself but a read only variant to prevent modifications
+		// NOTE: if every call of this method would result in a new list being created, there
+		// would be no need for a read only collection, but that would be sub-optimal from a
+		// performance point of view. So would cloning the existing list. Therefore a read only
+		// collection seems the way to go.
+		// TODO: It would be even better to store a single ReadOnlyCollection instance for each
+		// list in the first place, instead if creating a new one every time. While the overhead
+		// from creating a new collection should be minimal, its an overhead nonetheless and the
+		// collection is read only anyway, so there would be no harm in handing each caller the
+		// same instance.
+		return new ReadOnlyCollection<Entity>(list);
 	}
 }

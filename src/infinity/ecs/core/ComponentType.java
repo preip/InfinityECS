@@ -4,9 +4,11 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 /**
- * ComponentType hold a unique for the type of a Component and some static
- * utility functions for getting the specific id of the ComponentType of a
- * Component.
+ * ComponentType hold a unique for the type of a Component and some static utility functions for
+ * getting the specific id of the ComponentType of a Component.
+ * 
+ * @author preip
+ * @version 1.0 
  */
 public final class ComponentType {
 
@@ -15,12 +17,22 @@ public final class ComponentType {
      */
     private static final HashMap<Class<? extends Component>, 
             ComponentType> _classLib = new HashMap<>();
-
+    
+    /**
+     * Gets the ComponentType based on the specified Component instance.
+     *
+     * @param Component The Component instance for this the ComponentType should be got.
+     * @return The resulting ComponentType.
+     */
+    public static ComponentType get(Component component) {
+    	// lets just call get() for the class type and hope the compiler inlines it
+    	return get(component.getClass());
+    }
+    
     /**
      * Gets the ComponentType based on the specified Component class.
      *
-     * @param typeClass The Component class for this the ComponentType should be
-     * got.
+     * @param typeClass The Component class for this the ComponentType should be got.
      * @return The resulting ComponentType.
      */
     public static ComponentType get(Class<? extends Component> typeClass) {
@@ -33,8 +45,8 @@ public final class ComponentType {
     }
 
     /**
-     * Tries to get the ComponentType based on the specified type ID. WARNING:
-     * comparatively slow to getting ComponentTypes by their class.
+     * Tries to get the ComponentType based on the specified type ID.
+     * WARNING: comparatively slow to getting ComponentTypes by their class.
      *
      * @param typeId The ID for which the ComponentType should be got.
      * @return The resulting ComponentType or null if the id was not found.

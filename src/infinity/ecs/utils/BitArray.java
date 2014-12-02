@@ -38,7 +38,7 @@ public class BitArray {
      * @return The current state of the desired bit.
      */
     public boolean get(int index) {
-	// the required array index is just the index divided by the size of the
+    	// the required array index is just the index divided by the size of the
         // datatype, which is 32 bit for integers.
         // since shifts are faster than division, a right shift of 5 is used 
         // instead, which gets the same result
@@ -49,12 +49,12 @@ public class BitArray {
         if (arrayIndex >= _array.length) {
             return false;
         }
-	// create the search mask by setting all bits above the 31 bit to zero, 
+        // create the search mask by setting all bits above the 31 bit to zero, 
         // so only the index bits for the current
         // array cell remain. The value is then shifted to the left by the 
         //number of places determined by that index 
         int mask = 1 << (index & 0x1F);
-	// the corresponding integer is conjuncted by a binary and, which 
+        // the corresponding integer is conjuncted by a binary and, which 
         // results in the value zero, if the bit was not set, or nine zero, 
         //if it was set, which is exactly what is returned as the result
         return (_array[arrayIndex] & mask) != 0;
@@ -68,7 +68,7 @@ public class BitArray {
      * @param value The value which the bit should be set to.
      */
     public void set(int index, boolean value) {
-	// the required array index is just the index divided by the size of the
+    	// the required array index is just the index divided by the size of the
         //datatype, which is 32 bit for integers.
         // since shifts are faster than division, a right shift of 5 is used 
         //instead, which gets the same result.
@@ -84,7 +84,7 @@ public class BitArray {
             // otherwise the array gets resized to match the required size
             ResizeArray(arrayIndex + 1);
         }
-	// create the search mask by setting all bits above the 31 bit to zero,
+        // create the search mask by setting all bits above the 31 bit to zero,
         // so only the index bits for the current array cell remain.
         //The value is then shifted to the left by the number of places 
         //determined by that index.
@@ -104,7 +104,7 @@ public class BitArray {
     public boolean contains(BitArray bitArray) {
         int i = 0;
         int l = Math.min(_array.length, bitArray._array.length);
-	// to check, if all set bits from the other array are also set in this 
+        // to check, if all set bits from the other array are also set in this 
         // array, each integer which is index is part of both arrays is AND 
         // conjuncted. If the result of the conjunction is the same as the 
         // corresponding integer from the other array,this array contains all 
@@ -115,13 +115,13 @@ public class BitArray {
                 return false;
             }
         }
-	// if this array is the same length or longer than the other array, 
+        // if this array is the same length or longer than the other array, 
         // and the above comparisons were all true, than the comparison is 
         // finished.
         if (_array.length >= bitArray._array.length) {
             return true;
         }
-	// otherwise all integers of the other array that are above the size 
+        // otherwise all integers of the other array that are above the size 
         // of this array need to be checked. If they contain any set bits, 
         // the whole comparison is false. 
         l = bitArray._array.length;
@@ -164,17 +164,19 @@ public class BitArray {
         BitArray that = (BitArray) obj;
         // check all bits that both arrays have in common
         int commonLength = Math.min(this._array.length, that._array.length);
-        for (int i = 0; i < commonLength; i++) // if one of the bits doesn't match, the bit arrays can't be equal                             
+        // if one of the bits doesn't match, the bit arrays can't be equal
+        for (int i = 0; i < commonLength; i++)                             
         {
             if (this._array[i] != that._array[i]) {
                 return false;
             }
         }
-	// if the common bits of both arrays were equal, check the remaining
+        // if the common bits of both arrays were equal, check the remaining
         // bits of the bigger array
         BitArray max = this._array.length > that._array.length ? this : that;
         int maxLength = max._array.length;
-        for (int i = commonLength; i < maxLength; i++) // if one of the remaining bits is not zero, the two arrays can't be equal 
+        // if one of the remaining bits is not zero, the two arrays can't be equal
+        for (int i = commonLength; i < maxLength; i++) 
         {
             if (max._array[i] != 0) {
                 return false;
