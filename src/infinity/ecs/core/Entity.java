@@ -45,42 +45,42 @@ public class Entity {
 	public ReadOnlyCollection<Component> getComponents(ComponentType type) {
 		return new ReadOnlyCollection<Component>(_components.get(type));
 	}
-      
-    /**
-     * Adds new components to the entity.
-     * @param components the components you wish to add
-     * @throws ComponentAlreadyExistsException If the component that should be added is unique and
-     * the entity already contains a component of the same type.
-     */
-    // TODO: We need some check to know if there can only be a single component of this type
+
+	/**
+	 * Adds new components to the entity.
+	 * @param components the components you wish to add
+	 * @throws ComponentAlreadyExistsException If the component that should be added is unique and
+	 * the entity already contains a component of the same type.
+	 */
+	// TODO: We need some check to know if there can only be a single component of this type
 	// TODO: make this package private and only allow new components to be added to the entity
 	// by the EntityManager (so it can track all changes to and entity and notify all systems
 	// accordingly
 	// CHANGE: changed this to use actual components, not just component types
-    public void addComponents(Component ... components) 
-            throws ComponentAlreadyExistsException {
-        for(Component component : components) {
-            ComponentType type = ComponentType.get(component);
-            ArrayList<Component> tCmp = _components.get(type);
-            // if the component which should be added is unique and the entity already contains
-            // an instance of the same type, throw an exception, because adding the component
-            // would result in an invalid state
-            if (component.isUnique() && tCmp != null && tCmp.size() > 0)
-            	throw new ComponentAlreadyExistsException
-            		("Component is unique and the entity already contains an instance.");
-            // if there was no component list for the specified type, create one
-            if (tCmp == null) {
-        		tCmp = new ArrayList<Component>();
-        		_components.put(type, tCmp);
-            }
-            // finally, add the component to the list
-            tCmp.add(component);
-        }
-    }
-        
-    public ComponentMask getComponentMask(){
-        return new ComponentMask(_components.keySet());
-    }
+	public void addComponents(Component ... components) 
+			throws ComponentAlreadyExistsException {
+		for(Component component : components) {
+			ComponentType type = ComponentType.get(component);
+			ArrayList<Component> tCmp = _components.get(type);
+			// if the component which should be added is unique and the entity already contains
+			// an instance of the same type, throw an exception, because adding the component
+			// would result in an invalid state
+			if (component.isUnique() && tCmp != null && tCmp.size() > 0)
+				throw new ComponentAlreadyExistsException
+					("Component is unique and the entity already contains an instance.");
+			// if there was no component list for the specified type, create one
+			if (tCmp == null) {
+				tCmp = new ArrayList<Component>();
+				_components.put(type, tCmp);
+			}
+			// finally, add the component to the list
+			tCmp.add(component);
+		}
+	}
+
+	public ComponentMask getComponentMask(){
+		return new ComponentMask(_components.keySet());
+	}
 
 	@Override
 	public boolean equals(Object obj) {

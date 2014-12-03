@@ -37,107 +37,102 @@ package infinity.ecs.utils;
  * @version 1.0
  */
 public class IdPool {
+	/**
+	 * The amount of IDs handed out by this pool, this includes freed IDs.
+	 * <p>
+	 * Used to determine the next unique ID if there are no free IDs, which can
+	 * be distributed first.
+	 */
+	private int _idCount; //TODO: Something to capture the integer overflow.
+	/**
+	 * Array that is used as a stack and contains all IDs that was have been
+	 * freed and can therefore be reused.
+	 */
+	private int[] _freeIds;
+	/**
+	 * Points to the current position an the stack of free IDs. A value of -1
+	 * means there are currently no free IDs.
+	 */
+	private int _freeIdsPointer;
 
-    /**
-     * The amount of IDs handed out by this pool, this includes freed IDs.
-     * <p>
-     * Used to determine the next unique ID if there are no free IDs, which can
-     * be distributed first.
-     */
-    private int _idCount; //TODO: Something to capture the integer overflow.
-    /**
-     * Array that is used as a stack and contains all IDs that was have been
-     * freed and can therefore be reused.
-     */
-    private int[] _freeIds;
-    /**
-     * Points to the current position an the stack of free IDs. A value of -1
-     * means there are currently no free IDs.
-     */
-    private int _freeIdsPointer;
+	/**
+	 * Creates a new instance of the IdPool class. The capacity of the stack for
+	 * free IDs will be set to 255.
+	 */
+	public IdPool() {
+		this(255);
+	}
 
-    /**
-     * Creates a new instance of the IdPool class. The capacity of the stack for
-     * free IDs will be set to 255.
-     */
-    public IdPool() {
-        this(255);
-    }
+	/**
+	 * Creates a new instance of the IdPool class.
+	 *
+	 * @param freeIdCapacity The capacity of the stack for free IDs.
+	 */
+	public IdPool(int freeIdCapacity) {
+		_idCount = 0;
+		_freeIds = new int[freeIdCapacity];
+		_freeIdsPointer = -1;
+	}
 
-    /**
-     * Creates a new instance of the IdPool class.
-     *
-     * @param freeIdCapacity The capacity of the stack for free IDs.
-     */
-    public IdPool(int freeIdCapacity) {
-        _idCount = 0;
-        _freeIds = new int[freeIdCapacity];
-        _freeIdsPointer = -1;
-    }
+	/**
+	 * Get an unique ID from this pool.
+	 *
+	 * @return The resulting ID.
+	 */
+	public int getId() {
+		if (_freeIdsPointer != -1)
+			return _freeIds[_freeIdsPointer--];
+		return _idCount++;
+	}
 
-    /**
-     * Get an unique ID from this pool.
-     *
-     * @return The resulting ID.
-     */
-    public int getId() {
-        if (_freeIdsPointer != -1) {
-            return _freeIds[_freeIdsPointer--];
-        }
-        return _idCount++;
-    }
+	/**
+	 * Free a previously distributed ID which is no longer needed.
+	 *
+	 * @param id The ID which should be free.
+	 */
+	public void freeId(int id) {
+		if (_freeIdsPointer != _freeIds.length - 1)
+			_freeIds[++_freeIdsPointer] = id;
+	}
 
-    /**
-     * Free a previously distributed ID which is no longer needed.
-     *
-     * @param id The ID which should be free.
-     */
-    public void freeId(int id) {
-        if (_freeIdsPointer != _freeIds.length - 1) {
-            _freeIds[++_freeIdsPointer] = id;
-        }
-    }
+	/**
+	 * Gets the current
+	 *
+	 * @return
+	 */
+	public int getFreeIdCapacity() {
+		return _freeIds.length;
+	}
 
-    /**
-     * Gets the current
-     *
-     * @return
-     */
-    public int getFreeIdCapacity() {
-        return _freeIds.length;
-    }
-
-    /**
-     * Sets the capacity of the stack which is used to store the currently free
-     * IDs. WARNING: This is a slow operation, because it requires copying the
-     * current stack, if it's not empty. Therefore this should be used
-     * sparingly.
-     *
-     * @param capacity The desired new capacity. Values below zero are set to
-     * zero.
-     */
-    public void setFreeIdCapacity(int capacity) {
-        // The minimum length is of course zero, so make sure everything 
-        //smaller is set to zero
-        if (capacity < 0) {
-            capacity = 0;
-        }
-        // if the new capacity is the same as the current one, there is no need 
-        //to do anything
-        if (capacity == _freeIds.length) {
-            return;
-        }
-        int[] newFreeIds = new int[capacity];
-        // if the stack is currently not empty, its contents must be copied to 
-        //the new array
-        if (_freeIdsPointer != -1) {
-            // get whichever is smaller, the new capacity or the current 
-            // position of the stack pointer, because it's not possible to copy 
-            // more than the new stack would hold, but there is also no point 
-            // in copying more data than is used anyway
-            int length = Math.min(capacity, _freeIdsPointer);
-            System.arraycopy(_freeIds, 0, newFreeIds, 0, length);
-        }
-        _freeIds = newFreeIds;
-    }
+	/**
+	 * Sets the capacity of the stack which is used to store the currently free
+	 * IDs. WARNING: This is a slow operation, because it requires copying the
+	 * current stack, if it's not empty. Therefore this should be used
+	 * sparingly.
+	 *
+	 * @param capacity The desired new capacity. Values below zero are set to
+	 * zero.
+	 */
+	public void setFreeIdCapacity(int capacity) {
+		// The minimum length is of course zero, so make sure everything 
+		//smaller is set to zero
+		if (capacity < 0)
+			capacity = 0;
+		// if the new capacity is the same as the current one, there is no need 
+		//to do anything
+		if (capacity == _freeIds.length)
+			return;
+		int[] newFreeIds = new int[capacity];
+		// if the stack is currently not empty, its contents must be copied to 
+		//the new array
+		if (_freeIdsPointer != -1) {
+			// get whichever is smaller, the new capacity or the current 
+			// position of the stack pointer, because it's not possible to copy 
+			// more than the new stack would hold, but there is also no point 
+			// in copying more data than is used anyway
+			int length = Math.min(capacity, _freeIdsPointer);
+			System.arraycopy(_freeIds, 0, newFreeIds, 0, length);
+		}
+		_freeIds = newFreeIds;
+	}
 }

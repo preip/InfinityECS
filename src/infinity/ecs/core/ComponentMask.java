@@ -43,23 +43,23 @@ public class ComponentMask {
 		_bitArray = new BitArray();
 		set(componentTypes);
 	}
-        
-    public ComponentMask(Collection<ComponentType> componentTypes) {
-        _bitArray = new BitArray();
-        set(componentTypes);
-    }
-        
-    final void set(Collection<ComponentType> componentTypes) {
-        Iterator<ComponentType> iter = componentTypes.iterator();
-        while(iter.hasNext())
-            _bitArray.set(iter.next().getId(), true);
-    }
-        
-    final void clear(Collection<ComponentType> componentTypes) {
-        Iterator<ComponentType> iter = componentTypes.iterator();
-        while(iter.hasNext())
-            _bitArray.set(iter.next().getId(), false);            
-    }
+
+	public ComponentMask(Collection<ComponentType> componentTypes) {
+		_bitArray = new BitArray();
+		set(componentTypes);
+	}
+
+	final void set(Collection<ComponentType> componentTypes) {
+		Iterator<ComponentType> iter = componentTypes.iterator();
+		while(iter.hasNext())
+			_bitArray.set(iter.next().getId(), true);
+	}
+
+	final void clear(Collection<ComponentType> componentTypes) {
+		Iterator<ComponentType> iter = componentTypes.iterator();
+		while(iter.hasNext())
+			_bitArray.set(iter.next().getId(), false);            
+	}
 	
 	final void set(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
@@ -74,7 +74,7 @@ public class ComponentMask {
 	 * Checks, if the component mask contains all specified ComponentTypes.
 	 * @param componentTypes The ComponentTypes which should be checked.
 	 * @return true if the mask contains all specified types, otherwise 
-         * false.
+	 * false.
 	 */
 	public boolean contains(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)

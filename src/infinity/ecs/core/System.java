@@ -10,5 +10,4 @@ package infinity.ecs.core;
  * @author Simon
  */
 public abstract class System {
-    
 }
