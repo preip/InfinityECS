@@ -3,9 +3,9 @@ package infinity.ecs.core;
 import java.util.HashMap;
 
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
+import infinity.ecs.utils.ReadOnlyMap;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * 
@@ -25,16 +25,15 @@ public class Entity {
 	private final HashMap<ComponentType,Component> _components;
 	
 	/**
-	 * A list of all nested entities for this entity. Only the EntityManager should add and 
-	 * delete from this list, therefor only package private. 
+	 * A list of all nested entities for this entity.  
 	 */
-	final HashMap<Integer,Entity> _nestedEntities;
+	private final HashMap<Integer,Entity> _nestedEntities;
 	
 	/**
 	 * If the Entity is nested this field contains the super Entity. Should only be set by the
 	 * EntityManager therefor only package private.
 	 */
-	Entity _superEntity;
+	private Entity _superEntity;
 	
 	/**
 	 * Package private constructor, which initializes the entity with the 
@@ -48,20 +47,57 @@ public class Entity {
 		_nestedEntities = new HashMap<>();
 	}
 	
+	/**
+	 * 
+	 * @return the unique ID of the Entity.
+	 */
 	public int getId() {
 		return _id;
 	}
 	
+	/**
+	 * 
+	 * @return True if this Entity is nested in another.
+	 */
 	public boolean isNested(){
 	    return (_superEntity != null);
 	}
 	
+	/**
+	 * 
+	 * @return A Map of the Entities nested in this Entity.
+	 */
 	public HashMap<Integer,Entity> getNestedEntitys() {
 	    return _nestedEntities;
 	}
 	
+	/**
+	 * 
+	 * @param type the Type of the Component.
+	 * @return the unique Component of the specified ComponentType.
+	 */
 	public Component getComponent(ComponentType type) {
 	    return _components.get(type);
+	}
+	
+	/**
+	 * Adds a nested Entity to the Entity.
+	 * Note: It will not work if you try do nest an Entity in itself.
+	 * @param nestedEntity
+	 */
+	public void addNestedEntity(Entity nestedEntity){
+	    if(this == nestedEntity)
+		return;
+	    nestedEntity._superEntity = this;
+	    this._nestedEntities.put(nestedEntity.getId(), nestedEntity);
+	}
+	
+	/**
+	 * Returns a ReadOnlyMap of all Entities that are nested in this Entity.
+	 * @return 
+	 */
+	public ReadOnlyMap<Integer,Entity> getNestedEntities() {
+	    return new ReadOnlyMap<>(this._nestedEntities);
 	}
 	
 	/**

@@ -75,15 +75,6 @@ public class EntityManager {
 		return result;
 	}
 	
-	/**
-	 * Adds a nested Entity to a super Entity.
-	 * @param superEntity 
-	 * @param nestedEntity 
-	 */
-	public void addNestedEntity(Entity superEntity, Entity nestedEntity){
-	    nestedEntity._superEntity = superEntity;
-	    superEntity._nestedEntities.put(nestedEntity.getId(),nestedEntity);
-	}
 	
 	/**
 	 * Creates a new, empty Entity with a unique ID.
