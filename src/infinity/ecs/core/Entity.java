@@ -3,6 +3,9 @@ package infinity.ecs.core;
 import java.util.HashMap;
 
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * 
@@ -22,6 +25,18 @@ public class Entity {
 	private final HashMap<ComponentType,Component> _components;
 	
 	/**
+	 * A list of all nested entities for this entity. Only the EntityManager should add and 
+	 * delete from this list, therefor only package private. 
+	 */
+	final HashMap<Integer,Entity> _nestedEntities;
+	
+	/**
+	 * If the Entity is nested this field contains the super Entity. Should only be set by the
+	 * EntityManager therefor only package private.
+	 */
+	Entity _superEntity;
+	
+	/**
 	 * Package private constructor, which initializes the entity with the 
 	 * specified id. Can't be public, or IDs were no longer be guaranteed 
 	 * to be unique
@@ -30,14 +45,45 @@ public class Entity {
 	Entity(int id) {
 		_id = id;
 		_components = new HashMap<>();
+		_nestedEntities = new HashMap<>();
 	}
 	
 	public int getId() {
 		return _id;
 	}
 	
+	public boolean isNested(){
+	    return (_superEntity != null);
+	}
+	
+	public HashMap<Integer,Entity> getNestedEntitys() {
+	    return _nestedEntities;
+	}
+	
 	public Component getComponent(ComponentType type) {
-		return _components.get(type);
+	    return _components.get(type);
+	}
+	
+	/**
+	 * Iterates over all nested Entities (also the nested Entities of nested Entities etc.) 
+	 * and retrieves their component with the right ComponentType.
+	 * @param type The ComponentType of the Component.
+	 * @return the nested Components, or null if there are no components of this type.
+	 */
+	public ArrayList<Component> getNestedComponents(ComponentType type) {
+	    LinkedList<Entity> entityQue = new LinkedList<>();
+	    ArrayList<Component> nestedComponents = new ArrayList<>();
+	    entityQue.addAll(_nestedEntities.values());
+	    while(!entityQue.isEmpty()){
+		Entity tempEntity = entityQue.poll();
+		//Checks if there are nested Entities in nested the Entity and adds them to the que
+		if(!tempEntity._nestedEntities.isEmpty()) {
+		    entityQue.addAll(tempEntity._nestedEntities.values());
+		}
+		//Adds the new nested component to the return list
+		nestedComponents.add(tempEntity.getComponent(type));
+	    }
+	    return nestedComponents;
 	}
 
 	/**
