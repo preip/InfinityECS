@@ -25,7 +25,7 @@ public class EntityTest {
     
     @BeforeClass
     public static void setUpClass(){
-        _manager = new EntityManager();
+        _manager = EntityManager.getEntityManager();
     }
     
     @AfterClass

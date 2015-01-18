@@ -9,7 +9,7 @@ public abstract class Component {
 	 */
 	public abstract boolean isUnique();
 	/**
-	 * Gets the ComponentType of this Copmonent.
+	 * Gets the ComponentType of this Component.
 	 * @return The resulting ComponentType.
 	 */
 	public ComponentType getComponentType() {

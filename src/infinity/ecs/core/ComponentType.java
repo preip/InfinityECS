@@ -21,7 +21,7 @@ public final class ComponentType {
 	/**
 	 * Gets the ComponentType based on the specified Component instance.
 	 *
-	 * @param Component The Component instance for this the ComponentType should be got.
+	 * @param component The Component instance for this the ComponentType should be got.
 	 * @return The resulting ComponentType.
 	 */
 	public static ComponentType get(Component component) {
@@ -100,6 +100,7 @@ public final class ComponentType {
 	 * Checks if this ComponentType is equal to the specified object.
 	 *
 	 * @param obj The object this ComponentType is compared with.
+	 * @return 
 	 */
 	@Override
 	public boolean equals(Object obj) {

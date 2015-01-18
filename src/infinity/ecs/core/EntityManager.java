@@ -7,16 +7,23 @@ import java.util.Map.Entry;
 
 import infinity.ecs.utils.IdPool;
 import infinity.ecs.utils.ReadOnlyCollection;
+import infinity.ecs.exceptions.ComponentAlreadyExistsException;
+import infinity.ecs.exceptions.EntityDoesNotExistsException;
+import infinity.ecs.exceptions.InfinityException;
 
 /**
  * Class which manages a set of entities. It can be used to create new entities with unique IDs,
  * add new components to an entity, get lists of entities which match a specific component mask
  * etc.  
  * 
- * @author preip
+ * @author preip, simon
  * @version 0.1
  */
 public class EntityManager {
+	/**
+	 * The only instance of the EntityManager.
+	 */
+	private static final EntityManager _instance = new EntityManager();
 	/**
 	 * The IdPool used by this entity manager to generate IDs for new entities.
 	 */
@@ -29,14 +36,22 @@ public class EntityManager {
 	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
 	 */
 	private final HashMap<ComponentMask, ArrayList<Entity>> _entitiesByMask;
-	
+
 	/**
 	 * Creates a new instance of the EntityManager class.
 	 */
-	public EntityManager() {
+	private EntityManager() {
 		_idPool = new IdPool();
-		_entities = new HashMap<Integer, Entity>();
-		_entitiesByMask = new HashMap<ComponentMask, ArrayList<Entity>>();
+		_entities = new HashMap<>();
+		_entitiesByMask = new HashMap<>();
+	}
+	
+	/**
+	 * 
+	 * @return The only instance of EntityManager.
+	 */
+	public static EntityManager getEntityManager() {
+	    return _instance;
 	}
 	
 	/**
@@ -46,7 +61,7 @@ public class EntityManager {
 	 * @return The resulting list of entities that contain the mask.
 	 */
 	private ArrayList<Entity> createNewEntityListByMask(ComponentMask mask) {
-		ArrayList<Entity> result = new ArrayList<Entity>();
+		ArrayList<Entity> result = new ArrayList<>();
 		// NOTE: According to some random benchmarks on the Internet, iterating over the entry sets
 		// is faster than iterating over the sources only. Thats why the whole set is used, but
 		// the key is of no interest for the operation.
@@ -70,6 +85,55 @@ public class EntityManager {
 		_entities.put(id, entity);
 		return entity;
 	}
+	
+	/**
+	 * 
+	 * @param id The unique id of the Entity requested.
+	 * @return
+	 * @throws EntityDoesNotExistsException 
+	 */
+	public Entity getEntity(Integer id) throws EntityDoesNotExistsException {
+	    Entity entity = _entities.get(id);
+	    if(entity == null) {
+		throw new EntityDoesNotExistsException();
+	    }
+	    return entity;
+	}
+	
+	/**
+	 * Adds new Components to a Entity and updates _entitiesByMask.
+	 * @param entity
+	 * @param components
+	 * @throws ComponentAlreadyExistsException 
+	 */
+	public void addComponents(Entity entity, Component... components) throws ComponentAlreadyExistsException {
+	    entity.addComponents(components);
+	    ComponentMask componentMask = entity.getComponentMask();
+	    ArrayList<Entity> componentMaskList = _entitiesByMask.get(componentMask);
+	    if(componentMaskList != null){
+		componentMaskList.remove(entity);
+	    }
+	    
+	    entity.addComponents(components);
+	    
+	    componentMaskList = _entitiesByMask.get(entity.getComponentMask());
+	    if(componentMaskList == null) {
+		componentMaskList = new ArrayList<>();
+	    }
+	    componentMaskList.add(entity);
+	}
+	
+	/**
+	 * Adds new Components to an Entity and updates _entitiesByMask.
+	 * @param id
+	 * @param components
+	 * @throws InfinityException 
+	 */
+	public void addComponents(Integer id, Component... components) throws InfinityException{
+	    Entity entity = this.getEntity(id);
+	    this.addComponents(entity, components);
+	}
+	
 	/**
 	 * Gets all entities that contain the components defined by the specified mask.
 	 * @param mask The mask for which an entity list should be got.
@@ -96,6 +160,6 @@ public class EntityManager {
 		// from creating a new collection should be minimal, its an overhead nonetheless and the
 		// collection is read only anyway, so there would be no harm in handing each caller the
 		// same instance.
-		return new ReadOnlyCollection<Entity>(list);
+		return new ReadOnlyCollection<>(list);
 	}
 }
