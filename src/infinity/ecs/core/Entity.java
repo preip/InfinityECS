@@ -1,5 +1,6 @@
 package infinity.ecs.core;
 
+import infinity.ecs.exceptions.AlreadyNestedException;
 import java.util.HashMap;
 
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
@@ -27,6 +28,7 @@ public class Entity {
 	/**
 	 * A list of all nested entities for this entity.  
 	 */
+	//Note: Maybe a list would be better.
 	private final HashMap<Integer,Entity> _nestedEntities;
 	
 	/**
@@ -65,14 +67,6 @@ public class Entity {
 	
 	/**
 	 * 
-	 * @return A Map of the Entities nested in this Entity.
-	 */
-	public HashMap<Integer,Entity> getNestedEntitys() {
-	    return _nestedEntities;
-	}
-	
-	/**
-	 * 
 	 * @param type the Type of the Component.
 	 * @return the unique Component of the specified ComponentType.
 	 */
@@ -84,12 +78,28 @@ public class Entity {
 	 * Adds a nested Entity to the Entity.
 	 * Note: It will not work if you try do nest an Entity in itself.
 	 * @param nestedEntity
+	 * @throws AlreadyNestedException Is thrown when nestedEntity is already nested.
 	 */
-	public void addNestedEntity(Entity nestedEntity){
+	void addNestedEntity(Entity nestedEntity) throws AlreadyNestedException{
 	    if(this == nestedEntity)
 		return;
+	    if(nestedEntity.isNested())
+		throw new AlreadyNestedException("This Entity is already nested");
 	    nestedEntity._superEntity = this;
 	    this._nestedEntities.put(nestedEntity.getId(), nestedEntity);
+	}
+	
+	/**
+	 * Removes a nested Entity from the Entity.
+	 * Note: Nothing happens if the 
+	 * @param nestedEntity 
+	 */
+	void removeNestedEntity(Entity nestedEntity) {
+	    //This check is needed if the Entity is nested in another Entity.
+	    if(_nestedEntities.containsValue(nestedEntity)) {
+		nestedEntity._superEntity = null;
+		_nestedEntities.remove(nestedEntity.getId());
+	    }
 	}
 	
 	/**
