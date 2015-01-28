@@ -4,7 +4,7 @@ import infinity.ecs.exceptions.AlreadyNestedException;
 import java.util.HashMap;
 
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
-import infinity.ecs.utils.ReadOnlyMap;
+import infinity.ecs.utils.ReadOnlyCollection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -18,6 +18,11 @@ public class Entity {
 	 * The unique id of the Entity.
 	 */
 	private final int _id;
+	
+	/**
+	 * The maximal depth of the nested hierarchy. An unnested Entity has depth 0.
+	 */
+	private final static int _maximumNestDepth = 3;
 
 	/**
 	 * A Map containing all Components that belong directly to this Entity, indexed by their
@@ -26,16 +31,15 @@ public class Entity {
 	private final HashMap<ComponentType,Component> _components;
 	
 	/**
-	 * A list of all nested entities for this entity.  
+	 * A list of all nested entities of this entity.  
 	 */
-	//Note: Maybe a list would be better.
-	private final HashMap<Integer,Entity> _nestedEntities;
+	private final ArrayList<Entity> _nestedEntities;
 	
 	/**
 	 * If the Entity is nested this field contains the super Entity. Should only be set by the
 	 * EntityManager therefor only package private.
 	 */
-	private Entity _superEntity;
+	private Entity _parentEntity;
 	
 	/**
 	 * Package private constructor, which initializes the entity with the 
@@ -46,7 +50,7 @@ public class Entity {
 	Entity(int id) {
 		_id = id;
 		_components = new HashMap<>();
-		_nestedEntities = new HashMap<>();
+		_nestedEntities = new ArrayList<>();
 	}
 	
 	/**
@@ -62,7 +66,7 @@ public class Entity {
 	 * @return True if this Entity is nested in another.
 	 */
 	public boolean isNested(){
-	    return (_superEntity != null);
+	    return (_parentEntity != null);
 	}
 	
 	/**
@@ -76,17 +80,22 @@ public class Entity {
 	
 	/**
 	 * Adds a nested Entity to the Entity.
-	 * Note: It will not work if you try do nest an Entity in itself.
+	 * Note: It will not work if you try do nest an Entity in itself, or a nested Entity of this 
+	 * Entity.
 	 * @param nestedEntity
 	 * @throws AlreadyNestedException Is thrown when nestedEntity is already nested.
 	 */
 	void addNestedEntity(Entity nestedEntity) throws AlreadyNestedException{
 	    if(this == nestedEntity)
 		return;
+	    //Checks if nestedEntity gets nested in a nested Entity of itself.
+	    //NOTE: This could be a performance issue.
+	    if(nestedEntity.getAllNestedEntities().contains(this))
+		return;
 	    if(nestedEntity.isNested())
 		throw new AlreadyNestedException("This Entity is already nested");
-	    nestedEntity._superEntity = this;
-	    this._nestedEntities.put(nestedEntity.getId(), nestedEntity);
+	    nestedEntity._parentEntity = this;
+	    this._nestedEntities.add(nestedEntity);
 	}
 	
 	/**
@@ -96,18 +105,42 @@ public class Entity {
 	 */
 	void removeNestedEntity(Entity nestedEntity) {
 	    //This check is needed if the Entity is nested in another Entity.
-	    if(_nestedEntities.containsValue(nestedEntity)) {
-		nestedEntity._superEntity = null;
-		_nestedEntities.remove(nestedEntity.getId());
+	    if(_nestedEntities.contains(nestedEntity)) {
+		nestedEntity._parentEntity = null;
+		_nestedEntities.remove(nestedEntity);
 	    }
 	}
 	
 	/**
-	 * Returns a ReadOnlyMap of all Entities that are nested in this Entity.
+	 * Returns a ReadOnlyCollection of all Entities that are <u> directly </u> nested in this 
+	 * Entity.
 	 * @return 
 	 */
-	public ReadOnlyMap<Integer,Entity> getNestedEntities() {
-	    return new ReadOnlyMap<>(this._nestedEntities);
+	public ReadOnlyCollection<Entity> getNestedEntities() {
+	    return new ReadOnlyCollection<>(this._nestedEntities);
+	}
+	
+	/**
+	 * Returns a ReadOnlyCollections of all Entities that are nested in this Entity, also
+	 * returns the nested Entities of the nested Entities and so on...
+	 * @return 
+	 */
+	public ReadOnlyCollection<Entity> getAllNestedEntities(){
+	    return new ReadOnlyCollection<>(this.getAllNestedEntitiesHelper());
+	}
+	
+	/**
+	 * A Helper function for the function getAllNestedEntities.
+	 * @return 
+	 */
+	private ArrayList<Entity> getAllNestedEntitiesHelper() {
+	    ArrayList<Entity> resultQueue = this._nestedEntities;
+	    int index = 0;
+	    while(index < resultQueue.size()){
+		Entity tempEntity = resultQueue.get(index);
+		resultQueue.addAll(tempEntity.getAllNestedEntitiesHelper());
+	    }
+	    return resultQueue;
 	}
 	
 	/**
@@ -119,12 +152,12 @@ public class Entity {
 	public ArrayList<Component> getNestedComponents(ComponentType type) {
 	    LinkedList<Entity> entityQue = new LinkedList<>();
 	    ArrayList<Component> nestedComponents = new ArrayList<>();
-	    entityQue.addAll(_nestedEntities.values());
+	    entityQue.addAll(_nestedEntities);
 	    while(!entityQue.isEmpty()){
 		Entity tempEntity = entityQue.poll();
 		//Checks if there are nested Entities in nested the Entity and adds them to the que
 		if(!tempEntity._nestedEntities.isEmpty()) {
-		    entityQue.addAll(tempEntity._nestedEntities.values());
+		    entityQue.addAll(tempEntity._nestedEntities);
 		}
 		//Adds the new nested component to the return list
 		nestedComponents.add(tempEntity.getComponent(type));

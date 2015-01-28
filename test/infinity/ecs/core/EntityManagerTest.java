@@ -51,9 +51,13 @@ public class EntityManagerTest {
     @Test
     public void testAddNestedEntity() {
 	assertFalse("Should not be nested",_entity2.isNested());
-	_entity.addNestedEntity(_entity2);
-	assertFalse("Should not be nested",_entity.isNested());
-	assertTrue("Should be nested",_entity2.isNested());
+	try{
+	    _entity.addNestedEntity(_entity2);
+	    assertFalse("Should not be nested",_entity.isNested());
+	    assertTrue("Should be nested",_entity2.isNested());
+	} catch (Exception e) {
+	    fail("Couldnt add a nested Entity");
+	}
     }
 
     /**
