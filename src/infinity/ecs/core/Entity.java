@@ -4,6 +4,8 @@ import infinity.ecs.exceptions.AlreadyNestedException;
 import java.util.HashMap;
 
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
+import infinity.ecs.exceptions.InfinityException;
+import infinity.ecs.exceptions.MaximumNestDepthException;
 import infinity.ecs.utils.ReadOnlyCollection;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -84,10 +86,13 @@ public class Entity {
 	 * Entity.
 	 * @param nestedEntity
 	 * @throws AlreadyNestedException Is thrown when nestedEntity is already nested.
+	 * @throws MaximumNestDepthException Is thrown when the maximum nest depth is exceeded.
 	 */
-	void addNestedEntity(Entity nestedEntity) throws AlreadyNestedException{
+	void addNestedEntity(Entity nestedEntity) throws InfinityException{
 	    if(this == nestedEntity)
 		return;
+	    if(this.getNestedDepth() > _maximumNestDepth)
+		throw new MaximumNestDepthException("The maximum nest Depth is" + _maximumNestDepth);
 	    //Checks if nestedEntity gets nested in a nested Entity of itself.
 	    //NOTE: This could be a performance issue.
 	    if(nestedEntity.getAllNestedEntities().contains(this))
@@ -96,6 +101,16 @@ public class Entity {
 		throw new AlreadyNestedException("This Entity is already nested");
 	    nestedEntity._parentEntity = this;
 	    this._nestedEntities.add(nestedEntity);
+	}
+	
+	/**
+	 * The nested depth of this Entity.
+	 * @return
+	 */
+	private int getNestedDepth() {
+	    if(_parentEntity == null)
+		return 0;
+	    return _parentEntity.getNestedDepth() + 1;
 	}
 	
 	/**
