@@ -36,7 +36,7 @@ public class EntityManager {
 	/**
 	 * A Map of all Entities that are not nested in other Entities.
 	 */
-	private final HashMap<Integer, Entity> _superEntities;
+	private final HashMap<Integer, Entity> _parentEntities;
 	/**
 	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
 	 */
@@ -44,7 +44,7 @@ public class EntityManager {
 	/**
 	 * A mapping of ComponentMask to all superEntities that contain that mask.
 	 */
-	private final HashMap<ComponentMask, ArrayList<Entity>> _superEntitiesByMask;
+	private final HashMap<ComponentMask, ArrayList<Entity>> _parentEntitiesByMask;
 
 	/**
 	 * Creates a new instance of the EntityManager class.
@@ -53,8 +53,8 @@ public class EntityManager {
 		_idPool = new IdPool();
 		_entities = new HashMap<>();
 		_entitiesByMask = new HashMap<>();
-		_superEntities = new HashMap<>();
-		_superEntitiesByMask = new HashMap<>();
+		_parentEntities = new HashMap<>();
+		_parentEntitiesByMask = new HashMap<>();
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class EntityManager {
 		int id = _idPool.getId();
 		Entity entity = new Entity(id);
 		_entities.put(id, entity);
-		_superEntities.put(id, entity);
+		_parentEntities.put(id, entity);
 		return entity;
 	}
 	
@@ -114,33 +114,33 @@ public class EntityManager {
 	}
 	
 	/**
-	 * Adds a new nested Entity to a super Entity, removes the nested Entity from _superEntities
-	 * and _superEntitiesByMask
-	 * @param superEntity
-	 * @param nestedEntity
+	 * Adds a new nested Entity to a super Entity, removes the nested Entity from _parentEntities
+ and _parentEntitiesByMask
+	 * @param parentEntity
+	 * @param childEntity
 	 * @throws infinity.ecs.exceptions.AlreadyNestedException
 	 */
-	public void addNestedEntity(Entity superEntity, Entity nestedEntity) 
+	public void addChildEntity(Entity parentEntity, Entity childEntity)
 		throws AlreadyNestedException {
-	    superEntity.addNestedEntity(nestedEntity);
-	    _superEntities.remove(nestedEntity.getId());
-	    ArrayList<Entity> maskEnt = _superEntitiesByMask.get(nestedEntity.getComponentMask());
-	    maskEnt.remove(nestedEntity);
+	    parentEntity.addChildEntity(childEntity);
+	    _parentEntities.remove(childEntity.getId());
+	    ArrayList<Entity> maskEnt = _parentEntitiesByMask.get(childEntity.getComponentMask());
+	    maskEnt.remove(childEntity);
 	}
 	
 	/**
-	 * Removes a nested Entity from a super Entity, adds the nested Entity to _superEntities and
-	 * _superEntititesByMask.
-	 * @param superEntity
-	 * @param nestedEntity 
+	 * Removes a nested Entity from a super Entity, adds the nested Entity to _parentEntities and
+ _superEntititesByMask.
+	 * @param parentEntity
+	 * @param childEntity 
 	 */
-	public void removeNestedEntity(Entity superEntity, Entity nestedEntity) {
-	    superEntity.removeNestedEntity(nestedEntity);
-	    _superEntities.put(nestedEntity.getId(), nestedEntity);
-	    ComponentMask mask = nestedEntity.getComponentMask();
-	    ArrayList<Entity> list = _superEntitiesByMask.get(mask);
-	    list.add(nestedEntity);
-	    _superEntitiesByMask.put(mask, list);
+	public void removeChildEntity(Entity parentEntity, Entity childEntity) {
+	    parentEntity.removeChildEntity(childEntity);
+	    _parentEntities.put(childEntity.getId(), childEntity);
+	    ComponentMask mask = childEntity.getComponentMask();
+	    ArrayList<Entity> list = _parentEntitiesByMask.get(mask);
+	    list.add(childEntity);
+	    _parentEntitiesByMask.put(mask, list);
 	}
 	
 	/**
@@ -149,7 +149,8 @@ public class EntityManager {
 	 * @param components
 	 * @throws ComponentAlreadyExistsException 
 	 */
-	public void addComponents(Entity entity, Component... components) throws ComponentAlreadyExistsException {
+	public void addComponents(Entity entity, Component... components) 
+		throws ComponentAlreadyExistsException {
 	    entity.addComponents(components);
 	    ComponentMask componentMask = entity.getComponentMask();
 	    ArrayList<Entity> componentMaskList = _entitiesByMask.get(componentMask);
