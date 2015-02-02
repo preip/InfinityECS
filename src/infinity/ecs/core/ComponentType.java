@@ -1,23 +1,44 @@
 package infinity.ecs.core;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * ComponentType hold a unique for the type of a Component and some static utility functions for
- * getting the specific id of the ComponentType of a Component.
+ * ComponentTypes act as unique identifiers for every type of {@link Component}, by which they can
+ * be distinguished. ComponentTypes therefore also act as the basis for {@link ComponentMask}.
  * 
  * @author preip
  * @version 1.0 
  */
 public final class ComponentType {
-
+	
+	//----------------------------------------------------------------------------------------------
+	// Static Fields
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * Contains all current componentTypes indexed by their class.
+	 * Is used to look up component types based on their class.
 	 */
-	private static final HashMap<Class<? extends Component>, 
-		ComponentType> _classLib = new HashMap<>();
+	private static final HashMap<Class<? extends Component>, ComponentType> _classLib
+		= new HashMap<>();
+	
+	/**
+	 * A list of all existing components, sorted by their id.
+	 * Is used to look up component types based on their id.
+	 * 
+	 * NOTE: The list is in fact never actually sorted, but since component types and therefore
+	 * their id never become invalid during runtime, every component that is added to the list is
+	 * therefore automatically at the same position as it's ID, since each new ID, that is issued
+	 * to a component type is simply the current length of the component list.
+	 */
+	private static final ArrayList<ComponentType> _cTypes
+		= new ArrayList<ComponentType>();
 
+	//----------------------------------------------------------------------------------------------
+	// Static Methods
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * Gets the ComponentType based on the specified Component instance.
 	 *
@@ -36,30 +57,30 @@ public final class ComponentType {
 	 * @return The resulting ComponentType.
 	 */
 	public static ComponentType get(Class<? extends Component> typeClass) {
+		// try to get the component type, assuming there already is an entry for the class
 		ComponentType cType = _classLib.get(typeClass);
+		// if not,
 		if (cType == null) {
+			// a new one must be created
 			cType = new ComponentType(_classLib.size());
+			// and added to the class library, to enable the class based lookup
 			_classLib.put(typeClass, cType);
+			// and also to the component type list to enable the lookup based on IDs
+			_cTypes.add(cType);
 		}
 		return cType;
 	}
 
 	/**
 	 * Tries to get the ComponentType based on the specified type ID.
-	 * WARNING: comparatively slow to getting ComponentTypes by their class.
 	 *
 	 * @param typeId The ID for which the ComponentType should be got.
 	 * @return The resulting ComponentType or null if the id was not found.
 	 */
 	public static ComponentType get(int typeId) {
-		Iterator<ComponentType> it = _classLib.values().iterator();
-		while (it.hasNext()) {
-			ComponentType c = it.next();
-			if (c._id == typeId) {
-				return c;
-			}
-		}
-		return null;
+		if (typeId < 0 || typeId >= _cTypes.size())
+			return null;
+		return _cTypes.get(typeId);
 	}
 
 	/**
@@ -71,15 +92,23 @@ public final class ComponentType {
 	public static int getId(Class<? extends Component> typeClass) {
 		return get(typeClass)._id;
 	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Private Fields
+	//----------------------------------------------------------------------------------------------
 
 	/**
 	 * The unique id of this ComponentType.
 	 */
 	private final int _id;
+	
+	//----------------------------------------------------------------------------------------------
+	// Constructors
+	//----------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of the ComponentType class. No public access
-	 * allowed, because type IDs must be managed centrally.
+	 * Creates a new instance of the ComponentType class. No public access allowed, because type
+	 * IDs must be managed centrally.
 	 *
 	 * @param id The id of this ComponentType.
 	 */
@@ -87,6 +116,10 @@ public final class ComponentType {
 		_id = id;
 	}
 
+	//----------------------------------------------------------------------------------------------
+	// Public Methods
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * Gets the ID of this ComponentType.
 	 *
@@ -104,15 +137,12 @@ public final class ComponentType {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		ComponentType other = (ComponentType) obj;
 		return _id == other._id;
 	}
@@ -124,8 +154,8 @@ public final class ComponentType {
 	 */
 	@Override
 	public int hashCode() {
-		// the has code is just the id. This should make sure, 
-		// every componenetType is different from each other
+		// the hash code is just the ID. This should make sure every componenetType has a unique
+		// hash value, since the IDs themselves are unique.
 		return _id;
 	}
 }
