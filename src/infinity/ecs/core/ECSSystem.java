@@ -9,6 +9,7 @@ public abstract class ECSSystem {
      * The ComponentMask for all ComponentTypes that the ECSSystem needs.
      */
     protected ComponentMask _mask;
+    
     /**
      * Creates a new System.
      * @param mask the ComponentMask describing all Components that are needed for the system to
@@ -17,6 +18,13 @@ public abstract class ECSSystem {
     public ECSSystem(ComponentMask mask){
 	this._mask = mask;
     }
+    
+    /**
+     * The priority of this system for scheduling.
+     * @return 
+     */
+    public abstract Integer getPriority();
+    
     /**
      * 
      * @return The ComponentMask used by the ECSSystem.
@@ -24,6 +32,7 @@ public abstract class ECSSystem {
     public ComponentMask getComponentMask(){
 	return this._mask;
     }
+    
     /**
      * Runs the ECSSystem on all Entities.
      * @return true if all updates where successful.
