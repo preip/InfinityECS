@@ -3,10 +3,13 @@ package infinity.ecs.utils;
 
 import infinity.ecs.core.Entity;
 import infinity.ecs.core.EntityManager;
+
 import java.util.HashMap;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -29,7 +32,7 @@ public class ReadOnlyMapTest {
 	_hashmap = new HashMap<>();
 	_entity = _manager.createEntity();
 	_hashmap.put(_entity.getId(), _entity);
-	_rdoMap = new ReadOnlyMap(_hashmap);
+	_rdoMap = new ReadOnlyMap<Integer, Entity>(_hashmap);
     }
     
     @After
@@ -70,7 +73,8 @@ public class ReadOnlyMapTest {
      */
     @Test
     public void testIsEmpty() {
-	ReadOnlyMap<Integer,Entity> map = new ReadOnlyMap(new HashMap<Integer,Entity>());
+	ReadOnlyMap<Integer,Entity> map = new ReadOnlyMap<Integer, Entity>(new HashMap<Integer,
+			Entity>());
 	assertFalse("Should be false", _rdoMap.isEmpty());
 	assertTrue("Should be true", map.isEmpty());
     }

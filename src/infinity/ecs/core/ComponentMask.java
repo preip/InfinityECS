@@ -1,8 +1,11 @@
 package infinity.ecs.core;
 
 import infinity.ecs.utils.BitArray;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Can be used to create a mask that resembles a group of several components.
@@ -17,8 +20,8 @@ import java.util.Iterator;
  * core members. This enables entities to quickly alter their masks if the 
  * gain or loose components without the need to create a completely new mask.
  * 
- * Manipulation is not exposed outside of the core so prevent other objects 
- * changing the mask of an entity in a way, that results in an invalid state, 
+ * Manipulation is not exposed outside of the core to prevent other objects 
+ * changing the mask of an entity in a way that results in an invalid state, 
  * because the mask no longer resembles the components that entity contains.
  * 
  * @author preip, Simon
@@ -85,6 +88,15 @@ public class ComponentMask {
 	
 	public boolean contains(ComponentMask mask) {
 		return _bitArray.contains(mask._bitArray);
+	}
+	
+	public List<ComponentType> getComponentTypes() {
+		ArrayList<ComponentType> result = new ArrayList<ComponentType>();
+		int max = _bitArray.getCapacity();
+		for (int i = 0; i < max; i++)
+			if (_bitArray.get(i))
+				result.add(ComponentType.get(i));
+		return result;
 	}
 
 	@Override

@@ -10,7 +10,6 @@ package infinity.ecs.utils;
  * somewhere outside of the current capacity.
  *
  * @author preip
- * @version 1.0
  *
  * ToDo: Implement hashCode in an appropriate manner.
  */
