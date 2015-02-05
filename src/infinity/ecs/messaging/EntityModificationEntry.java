@@ -15,6 +15,10 @@ import infinity.ecs.core.Entity;
  */
 public final class EntityModificationEntry {
 	
+	//----------------------------------------------------------------------------------------------
+	// Fields
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * The entity which was modified. 
 	 */
@@ -24,6 +28,10 @@ public final class EntityModificationEntry {
 	 * A list of component types representing the component that have changed within the entry
 	 */
 	private final List<ComponentType> _cTypes; // could use a bit array instead
+	
+	//----------------------------------------------------------------------------------------------
+	// Constructors
+	//----------------------------------------------------------------------------------------------
 	
 	/**
 	 * Creates a new instance of the EntityModificationEntry class.
@@ -38,6 +46,10 @@ public final class EntityModificationEntry {
 		_entity = entity;
 		_cTypes = new ArrayList<ComponentType>();
 	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Methods
+	//----------------------------------------------------------------------------------------------
 	
 	/**
 	 * Get the entity which has been modified. 

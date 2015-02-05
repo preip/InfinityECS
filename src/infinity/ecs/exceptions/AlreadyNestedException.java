@@ -14,7 +14,7 @@ public class AlreadyNestedException extends InfinityException{
 	/**
 	 * Version UID for serialization.
 	 */
-	static final long serialVersionUID = 0;
+	private static final long serialVersionUID = 0;
 	
 	/** 
 	 * Constructs a new exception with null as its detail message 
