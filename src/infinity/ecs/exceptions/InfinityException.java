@@ -4,8 +4,13 @@ package infinity.ecs.exceptions;
  *
  * @author Simon
  */
-public class InfinityException extends Exception {
+public abstract class InfinityException extends Exception {
 	
+	/**
+	 * Version UID for serialization.
+	 */
+	private static final long serialVersionUID = 0;
+
 	/** 
 	 * Constructs a new exception with null as its detail message 
 	 */

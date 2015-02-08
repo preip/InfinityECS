@@ -39,6 +39,10 @@ public final class EntityModificationEndpoint {
 	// The best solution should be determined through profiling, for the time being the second
 	// option is used because it is less complex.
 	
+	//----------------------------------------------------------------------------------------------
+	// Fields
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * The dispatcher that this endpoit is associated with and to which new messages are send.
 	 */
@@ -49,12 +53,26 @@ public final class EntityModificationEndpoint {
 	 */
 	private Queue<EntityModificationEntry> _queue;
 	
+	//----------------------------------------------------------------------------------------------
+	// Constructors
+	//----------------------------------------------------------------------------------------------
+	
+	/**
+	 * Creates a new instance of the EntityModificationEndpoint class.
+	 * New instances should only be creates by the EntityModificationDispatcher.
+	 * 
+	 * @param dispatcher The EntityModificationDispatcher that this endpoint is associated with.
+	 */
 	EntityModificationEndpoint(EntityModificationDispatcher dispatcher) {
 		// since new endpoints are only created by the dispatcher, there is no need to check if
 		// the reference might be null
 		_dispatcher = dispatcher;
 		_queue = new ArrayDeque<EntityModificationEntry>();
 	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Methods
+	//----------------------------------------------------------------------------------------------
 	
 	/**
 	 * Gets the dispatcher this endpoint is associated with.

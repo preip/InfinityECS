@@ -6,6 +6,11 @@ package infinity.ecs.exceptions;
  */
 public class ComponentAlreadyExistsException extends InfinityException {
 	
+	/**
+	 * Version UID for serialization. 
+	 */
+	private static final long serialVersionUID = 0;
+	
 	/** 
 	 * Constructs a new exception with null as its detail message 
 	 */

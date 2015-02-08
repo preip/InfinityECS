@@ -21,31 +21,46 @@ import infinity.ecs.exceptions.InfinityException;
  * @version 0.1
  */
 public class EntityManager {
+	
+	//----------------------------------------------------------------------------------------------
+	// Fields
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * The only instance of the EntityManager.
+	 * TODO: Why is EntityManager a Singleton???
 	 */
 	private static final EntityManager _instance = new EntityManager();
+	
 	/**
 	 * The IdPool used by this entity manager to generate IDs for new entities.
 	 */
 	private final IdPool _idPool;
+	
 	/**
 	 * The list of all entities managed by this EntityManager indexed by their IDs. 
 	 */
 	private final HashMap<Integer, Entity> _entities;
+	
 	/**
 	 * A Map of all Entities that are not nested in other Entities.
 	 */
 	private final HashMap<Integer, Entity> _parentEntities;
+	
 	/**
 	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
 	 */
 	private final HashMap<ComponentMask, ArrayList<Entity>> _entitiesByMask;
+	
 	/**
 	 * A mapping of ComponentMask to all superEntities that contain that mask.
 	 */
 	private final HashMap<ComponentMask, ArrayList<Entity>> _parentEntitiesByMask;
 
+	//----------------------------------------------------------------------------------------------
+	// Constructors
+	//----------------------------------------------------------------------------------------------
+	
 	/**
 	 * Creates a new instance of the EntityManager class.
 	 */
@@ -56,6 +71,10 @@ public class EntityManager {
 		_parentEntities = new HashMap<>();
 		_parentEntitiesByMask = new HashMap<>();
 	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Methods
+	//----------------------------------------------------------------------------------------------
 	
 	/**
 	 * 
@@ -93,7 +112,7 @@ public class EntityManager {
 	 */
 	public Entity createEntity() {
 		int id = _idPool.getId();
-		Entity entity = new Entity(id);
+		Entity entity = new Entity(id, null);
 		_entities.put(id, entity);
 		_parentEntities.put(id, entity);
 		return entity;
@@ -107,9 +126,8 @@ public class EntityManager {
 	 */
 	public Entity getEntity(Integer id) throws EntityDoesNotExistsException {
 	    Entity entity = _entities.get(id);
-	    if(entity == null) {
-		throw new EntityDoesNotExistsException();
-	    }
+	    if(entity == null)
+	    	throw new EntityDoesNotExistsException();
 	    return entity;
 	}
 	
@@ -121,7 +139,7 @@ public class EntityManager {
 	 * @throws infinity.ecs.exceptions.AlreadyNestedException
 	 */
 	public void addChildEntity(Entity parentEntity, Entity childEntity)
-		throws AlreadyNestedException {
+			throws AlreadyNestedException {
 	    parentEntity.addChildEntity(childEntity);
 	    _parentEntities.remove(childEntity.getId());
 	    ArrayList<Entity> maskEnt = _parentEntitiesByMask.get(childEntity.getComponentMask());
@@ -154,16 +172,14 @@ public class EntityManager {
 	    entity.addComponents(components);
 	    ComponentMask componentMask = entity.getComponentMask();
 	    ArrayList<Entity> componentMaskList = _entitiesByMask.get(componentMask);
-	    if(componentMaskList != null){
-		componentMaskList.remove(entity);
-	    }
+	    if(componentMaskList != null)
+	    	componentMaskList.remove(entity);
 	    
 	    entity.addComponents(components);
 	    
 	    componentMaskList = _entitiesByMask.get(entity.getComponentMask());
-	    if(componentMaskList == null) {
-		componentMaskList = new ArrayList<>();
-	    }
+	    if(componentMaskList == null)
+	    	componentMaskList = new ArrayList<>();
 	    componentMaskList.add(entity);
 	}
 	
