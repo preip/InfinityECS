@@ -1,13 +1,22 @@
 package infinity.ecs.core;
 
-public abstract class Component {
+/**
+ * Interface which identifies all implementing classes as {@link Component}s which can be used as
+ * a specific data storage in combination with {@link Entity}s.
+ * 
+ * @author preip
+ */
+public interface Component {
 	/**
-	 * Gets the ComponentType of this Component.
-	 * @return The resulting ComponentType.
+	 * Gets the {@link ComponentType} of this {@link Component}.
+	 * <p>
+	 * <b>Notes:</b><br>
+	 * Every derived class must make sure to implement this method correctly, so that the returned
+	 * {@link ComponentType} is guaranteed to represent that specific class. This also means that
+	 * when a {@link Component}-implementation derives from a another {@link Component}-
+	 * implementation, it <i>must always override this method</i>.
+	 * 
+	 * @return The resulting {@link ComponentType}.
 	 */
-	public ComponentType getComponentType() {
-		// Kind of redundant with the get methods from ComponentType, but it might be handy to
-		// be able to access the type directly through a component instance.
-		return ComponentType.get(this.getClass());
-	}
+	public ComponentType getComponentType();
 }

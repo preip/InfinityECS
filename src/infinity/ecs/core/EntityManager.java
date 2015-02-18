@@ -43,19 +43,9 @@ public class EntityManager {
 	private final HashMap<Integer, Entity> _entities;
 	
 	/**
-	 * A Map of all Entities that are not nested in other Entities.
-	 */
-	private final HashMap<Integer, Entity> _parentEntities;
-	
-	/**
 	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
 	 */
 	private final HashMap<ComponentMask, ArrayList<Entity>> _entitiesByMask;
-	
-	/**
-	 * A mapping of ComponentMask to all superEntities that contain that mask.
-	 */
-	private final HashMap<ComponentMask, ArrayList<Entity>> _parentEntitiesByMask;
 
 	//----------------------------------------------------------------------------------------------
 	// Constructors
@@ -68,8 +58,6 @@ public class EntityManager {
 		_idPool = new IdPool();
 		_entities = new HashMap<>();
 		_entitiesByMask = new HashMap<>();
-		_parentEntities = new HashMap<>();
-		_parentEntitiesByMask = new HashMap<>();
 	}
 	
 	//----------------------------------------------------------------------------------------------
@@ -114,7 +102,6 @@ public class EntityManager {
 		int id = _idPool.getId();
 		Entity entity = new Entity(id, null);
 		_entities.put(id, entity);
-		_parentEntities.put(id, entity);
 		return entity;
 	}
 	
@@ -141,9 +128,6 @@ public class EntityManager {
 	public void addChildEntity(Entity parentEntity, Entity childEntity)
 			throws AlreadyNestedException {
 	    parentEntity.addChildEntity(childEntity);
-	    _parentEntities.remove(childEntity.getId());
-	    ArrayList<Entity> maskEnt = _parentEntitiesByMask.get(childEntity.getComponentMask());
-	    maskEnt.remove(childEntity);
 	}
 	
 	/**
@@ -154,11 +138,6 @@ public class EntityManager {
 	 */
 	public void removeChildEntity(Entity parentEntity, Entity childEntity) {
 	    parentEntity.removeChildEntity(childEntity);
-	    _parentEntities.put(childEntity.getId(), childEntity);
-	    ComponentMask mask = childEntity.getComponentMask();
-	    ArrayList<Entity> list = _parentEntitiesByMask.get(mask);
-	    list.add(childEntity);
-	    _parentEntitiesByMask.put(mask, list);
 	}
 	
 	/**

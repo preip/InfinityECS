@@ -8,12 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Can be used to create an immutable mask that resembles a group of several types of components.
- * Can be compared to other masks to find matches etc.
+ * Can be used to create an immutable mask that resembles a group of several types of
+ * {@link component}s. Can be compared to other masks to find matches etc.
  * <p>
  * <b>Notes:</b><br>
- * Tight wrapper around {@link BitArray} class. Should be used by Entities and  Systems to check if
- * the requirements from to Systems to the Entities are  matched.
+ * Tight wrapper around {@link BitArray} class. Should be used by {@link Entity}s and
+ * {@link EntitySystem}s to check if an entity contains the {@link component}s required by the
+ * system.
  * <p>
  * Manipulation of the masks after their initial creation is only allowed by core members. This
  * enables entities to quickly alter their masks if they  gain or loose components without the need
@@ -34,8 +35,8 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * The BitArray that acts as the base for the component mask and stores the id of every
-	 * ComponentType that is part of the map.
+	 * The {@link BitArray} that acts as the base for the {@link ComponentMask} and stores the id
+	 *  of every {@link ComponentType} that is part of the map.
 	 */
 	private final BitArray _bitArray;
 	
@@ -45,23 +46,23 @@ public class ComponentMask {
 	
 	/**
 	 * Copy constructor.
-	 * @param copy The componentMask which should be cloned.
+	 * @param copy The {@link ComponentMask} which should be cloned.
 	 */
 	public ComponentMask(ComponentMask copy) {
 		_bitArray = copy._bitArray.clone();
 	}
 
 	/**
-	 * Creates a new instance of the ComponentMask class.
+	 * Creates a new instance of the {@link ComponentMask} class.
 	 */
 	public ComponentMask() {
 		_bitArray = new BitArray();
 	}
 
 	/**
-	 * Creates a new instance of the ComponentMask class.
+	 * Creates a new instance of the {@link ComponentMask} class.
 	 * 
-	 * @param componentTypes The list of component types that the mask should resemble.
+	 * @param componentTypes The list of {@link ComponentType}s that the mask should resemble.
 	 */
 	public ComponentMask(ComponentType... componentTypes) {
 		_bitArray = new BitArray();
@@ -69,9 +70,9 @@ public class ComponentMask {
 	}
 
 	/**
-	 * Creates a new instance of the ComponentMask class.
+	 * Creates a new instance of the {@link ComponentMask} class.
 	 * 
-	 * @param componentTypes The list of component types that the mask should resemble.
+	 * @param componentTypes The list of {@link ComponentType}s that the mask should resemble.
 	 */
 	public ComponentMask(Collection<ComponentType> componentTypes) {
 		_bitArray = new BitArray();
@@ -83,9 +84,9 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Add the list of specified ComponentTypes to this mask.
+	 * Add the list of specified {@link ComponentTypes} to this mask.
 	 * 
-	 * @param componentTypes The list of ComponentTypes that should be added.
+	 * @param componentTypes The list of {@link ComponentTypes} that should be added.
 	 */
 	final void add(Collection<ComponentType> componentTypes) {
 		Iterator<ComponentType> iter = componentTypes.iterator();
@@ -94,9 +95,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Add the list of specified ComponentTypes to this mask.
+	 * Add the list of specified {@link ComponentTypes} to this mask.
 	 * 
-	 * @param componentTypes The list of ComponentTypes that should be added.
+	 * @param componentTypes The list of {@link ComponentTypes} that should be added.
 	 */
 	final void add(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
@@ -104,9 +105,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Removed the list of specified ComponentTypes from this mask.
+	 * Removed the list of specified {@link ComponentTypes} from this mask.
 	 * 
-	 * @param componentTypes The list of ComponentTypes that should be removed.
+	 * @param componentTypes The list of {@link ComponentTypes} that should be removed.
 	 */
 	final void remove(Collection<ComponentType> componentTypes) {
 		Iterator<ComponentType> iter = componentTypes.iterator();
@@ -115,9 +116,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Removed the list of specified ComponentTypes from this mask.
+	 * Removed the list of specified {@link ComponentTypes} from this mask.
 	 * 
-	 * @param componentTypes The list of ComponentTypes that should be removed.
+	 * @param componentTypes The list of {@link ComponentTypes} that should be removed.
 	 */
 	final void remove(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
@@ -129,9 +130,9 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Checks, if the component mask contains all specified ComponentTypes.
+	 * Checks, if the {@link ComponentMask} contains all specified {@link ComponentTypes}.
 	 * 
-	 * @param componentTypes The ComponentTypes which should be checked.
+	 * @param componentTypes The {@link ComponentTypes} which should be checked.
 	 * @return true if the mask contains all specified types, otherwise false.
 	 */
 	public boolean contains(ComponentType... componentTypes) {
@@ -142,7 +143,7 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Checks if this ComponentMask contains all the types defined by the specified mask.
+	 * Checks if this {@link ComponentMask} contains all the types defined by the specified mask.
 	 * 
 	 * @param mask The mask which should be checked.
 	 * @return True if this mask contains all the types of the specified mask, otherwise false.
@@ -152,7 +153,8 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Checks if this ComponentMask contains at least one of the types in the specified list.
+	 * Checks if this  {@link ComponentMask} contains at least one of the types in the specified
+	 * list.
 	 * 
 	 * @param mask The mask which should be checked.
 	 * @return True if this mask contains a least one of the types in the specified list,
@@ -166,8 +168,8 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Checks if this ComponentMask contains at least one of the types defined by the specified
-	 * mask.
+	 * Checks if this  {@link ComponentMask} contains at least one of the types defined by the
+	 * specified mask.
 	 * 
 	 * @param mask The mask which should be checked.
 	 * @return True if this mask contains a least one of the types of the specified mask,
@@ -178,9 +180,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Gets a list of all ComponentTypes that are part of the mask.
+	 * Gets a list of all {@link ComponentTypes} that are part of the mask.
 	 * 
-	 * @return The list of all ComponentTypes.
+	 * @return The list of all {@link ComponentTypes}.
 	 */
 	public List<ComponentType> getComponentTypes() {
 		ArrayList<ComponentType> result = new ArrayList<ComponentType>();

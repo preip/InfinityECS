@@ -19,6 +19,16 @@ import java.util.Map;
  */
 public final class IndexedMessageDispatcher implements MessageDispatcher {
 	
+	// Dev-Note:
+	// Can be made even faster by using a simple array instead of an hash map, in which the id of
+	// a message type acts as the index, like this:
+	// 	00|	List<IndexedMessageEndpoint2>[] _endpointRegister =
+	// 	01|		(List<IndexedMessageEndpoint2>[]) new List<?>[n];
+	// Performance tests indicate roughly 10% gain in performance, when the array is big enough to
+	// prevent resizing. For the moment the hash map variant is used because of the additional
+	// complexity of the array version regarding bound checking etc.
+	
+	
 	/**
 	 * All associated endpoints indexed by the id of the message types they have registered.
 	 */

@@ -17,15 +17,14 @@ public final class ComponentType {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Contains all current componentTypes indexed by their class.
-	 * Is used to look up component types based on their class.
+	 * Contains all current {@link ComponentType}s indexed by their class for lookup.
 	 */
 	private static final HashMap<Class<? extends Component>, ComponentType> _classLib
 		= new HashMap<>();
 	
 	/**
-	 * A list of all existing components, sorted by their id.
-	 * Is used to look up component types based on their id.
+	 * A list of all existing {@link Component}s, sorted by their id.
+	 * Is used to look up {@link ComponentType}s based on their id.
 	 * 
 	 * NOTE: The list is in fact never actually sorted, but since component types and therefore
 	 * their id never become invalid during runtime, every component that is added to the list is
@@ -40,10 +39,10 @@ public final class ComponentType {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Gets the ComponentType based on the specified Component instance.
+	 * Gets the {@link ComponentType} based on the specified {@link Component} instance.
 	 *
-	 * @param component The Component instance for this the ComponentType should be got.
-	 * @return The resulting ComponentType.
+	 * @param component The {@link Component} instance for which the {@link ComponentType} should be got.
+	 * @return The resulting {@link ComponentType}.
 	 */
 	public static ComponentType get(Component component) {
 		// lets just call get() for the class type and hope the compiler inlines it
@@ -51,10 +50,11 @@ public final class ComponentType {
 	}
 
 	/**
-	 * Gets the ComponentType based on the specified Component class.
+	 * Gets the {@link ComponentType} based on the specified {@link Component} class.
 	 *
-	 * @param typeClass The Component class for this the ComponentType should be got.
-	 * @return The resulting ComponentType.
+	 * @param typeClass The {@link Component} class for which the {@link ComponentType} should
+	 * 		be got.
+	 * @return The resulting {@link ComponentType}.
 	 */
 	public static ComponentType get(Class<? extends Component> typeClass) {
 		// try to get the component type, assuming there already is an entry for the class
@@ -72,10 +72,10 @@ public final class ComponentType {
 	}
 
 	/**
-	 * Tries to get the ComponentType based on the specified type ID.
+	 * Tries to get the {@link ComponentType} based on the specified type ID.
 	 *
-	 * @param typeId The ID for which the ComponentType should be got.
-	 * @return The resulting ComponentType or null if the id was not found.
+	 * @param typeId The ID for which the {@link ComponentType} should be got.
+	 * @return The resulting {@link ComponentType} or null if the id was not found.
 	 */
 	public static ComponentType get(int typeId) {
 		if (typeId < 0 || typeId >= _cTypes.size())
@@ -84,9 +84,9 @@ public final class ComponentType {
 	}
 
 	/**
-	 * Gets the ComponentType ID based on the specified Component class.
+	 * Gets the {@link ComponentType} ID based on the specified {@link Component} class.
 	 *
-	 * @param typeClass The Component class for this the ID should be got.
+	 * @param typeClass The {@link Component} class for which the ID should be got.
 	 * @return The resulting type ID.
 	 */
 	public static int getId(Class<? extends Component> typeClass) {
@@ -98,7 +98,7 @@ public final class ComponentType {
 	//----------------------------------------------------------------------------------------------
 
 	/**
-	 * The unique id of this ComponentType.
+	 * The unique id of this {@link ComponentType}.
 	 */
 	private final int _id;
 	
@@ -107,10 +107,10 @@ public final class ComponentType {
 	//----------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of the ComponentType class. No public access allowed, because type
-	 * IDs must be managed centrally.
+	 * Creates a new instance of the {@link ComponentType} class. No public access allowed, because
+	 * type IDs must be managed centrally.
 	 *
-	 * @param id The id of this ComponentType.
+	 * @param id The id of this {@link ComponentType}.
 	 */
 	private ComponentType(int id) {
 		_id = id;
@@ -121,7 +121,7 @@ public final class ComponentType {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Gets the ID of this ComponentType.
+	 * Gets the ID of this {@link ComponentType}.
 	 *
 	 * @return The resulting type ID.
 	 */
@@ -130,9 +130,9 @@ public final class ComponentType {
 	}
 
 	/**
-	 * Checks if this ComponentType is equal to the specified object.
+	 * Checks if this {@link ComponentType} is equal to the specified object.
 	 *
-	 * @param obj The object this ComponentType is compared with.
+	 * @param obj The object this {@link ComponentType} is compared with.
 	 * @return 
 	 */
 	@Override
@@ -148,7 +148,7 @@ public final class ComponentType {
 	}
 
 	/**
-	 * Gets the hash code of this ComonentType.
+	 * Gets the hash code of this {@link ComponentType}.
 	 *
 	 * @return The resulting hash code.
 	 */

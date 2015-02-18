@@ -20,7 +20,7 @@ public abstract class EntitySystem {
 	}
 	
 	/**
-	 * Gets the component mask of this system.
+	 * Gets the {@link ComponentMask} of this system.
 	 * 
 	 * @return The component mask
 	 */
@@ -28,12 +28,20 @@ public abstract class EntitySystem {
 		return _mask;
 	}
 	
+	/**
+	 * Initializes all resources needed by the system.
+	 */
 	public abstract void initialize();
 	
 	/**
 	 * Updates this system.
+	 * 
+	 * @param ellapsedTime The time which has elapsed since the last update.
 	 */
-	public abstract void update();
+	public abstract void update(int elapsedTime);
 	
+	/**
+	 * Frees all resources that are used by the system. 
+	 */
 	public abstract void terminate();
 }

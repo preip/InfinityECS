@@ -72,7 +72,7 @@ public class EntityManagerTest {
     /**
      * Test of getEntity method, of class EntityManager.
      */
-    @Test
+    /*@Test
     public void testGetEntity() throws Exception {
 	assertTrue("", _entity == _manager.getEntity(_entity.getId()));
 	try {
@@ -81,7 +81,7 @@ public class EntityManagerTest {
 	} catch (EntityDoesNotExistsException e) {
 	    
 	}
-    }
+    }*/
 
     /**
      * Test of addComponents method, of class EntityManager.
