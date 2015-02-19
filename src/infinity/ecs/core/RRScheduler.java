@@ -101,7 +101,7 @@ public class RRScheduler implements Scheduler{
 	this.makeSchedule();
 	while(_runFlag) {
 	    while(_index < _schedule.size()){
-		_schedule.get(_index).update();
+		_schedule.get(_index).update(0);
 		_index += 1;
 	    }
 	    _index = 0;

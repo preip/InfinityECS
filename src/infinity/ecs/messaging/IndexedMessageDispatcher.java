@@ -1,9 +1,9 @@
 package infinity.ecs.messaging;
 
+import infinity.ecs.utils.IndexedCollection;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A {@link MessageDispatcher} which uses an internal map to index the {@link MesssageType}s of
@@ -19,26 +19,16 @@ import java.util.Map;
  */
 public final class IndexedMessageDispatcher implements MessageDispatcher {
 	
-	// Dev-Note:
-	// Can be made even faster by using a simple array instead of an hash map, in which the id of
-	// a message type acts as the index, like this:
-	// 	00|	List<IndexedMessageEndpoint2>[] _endpointRegister =
-	// 	01|		(List<IndexedMessageEndpoint2>[]) new List<?>[n];
-	// Performance tests indicate roughly 10% gain in performance, when the array is big enough to
-	// prevent resizing. For the moment the hash map variant is used because of the additional
-	// complexity of the array version regarding bound checking etc.
-	
-	
 	/**
 	 * All associated endpoints indexed by the id of the message types they have registered.
 	 */
-	private Map<Integer, List<IndexedMessageEndpoint>> _endpointRegister;
+	private IndexedCollection<List<IndexedMessageEndpoint>> _endpointRegister;
 	
 	/**
 	 * Creates a new instance of the IndexedMessageDispatcher class.
 	 */
 	public IndexedMessageDispatcher() {
-		_endpointRegister = new HashMap<Integer, List<IndexedMessageEndpoint>>();
+		_endpointRegister = new IndexedCollection<List<IndexedMessageEndpoint>>(32);
 	}
 	
 	/**
@@ -75,7 +65,7 @@ public final class IndexedMessageDispatcher implements MessageDispatcher {
 		if (epList == null) {
 			epList = new ArrayList<IndexedMessageEndpoint>();
 			epList.add(endpoint);
-			_endpointRegister.put(msgId, epList);
+			_endpointRegister.set(msgId, epList);
 			return;
 		}
 		// otherwise the endpoint can be simply added to the list if it is not already part of it
@@ -118,7 +108,7 @@ public final class IndexedMessageDispatcher implements MessageDispatcher {
 	 * @param The endpoint which should be removed.
 	 */
 	void removeEndpoint(IndexedMessageEndpoint endpoint) {
-		for (List<IndexedMessageEndpoint> epList : _endpointRegister.values())
+		for (List<IndexedMessageEndpoint> epList : _endpointRegister)
 			epList.remove(endpoint);
 	}
 
