@@ -4,7 +4,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Represents a collection of elements, which are accessible by their unique index. 
+ * Represents a collection of elements, which are accessible by their unique index. Best used for
+ * cases where elements are get or set by their index most of the time. Should not be used if a
+ * very good iteration performance is required or where iterating trough the collection is the
+ * main case.
  * <p>
  * <b>Notes:</b><br>
  * Accessing an elements by its index is O(1) and the indices of elements are guaranteed to stay
@@ -15,7 +18,8 @@ import java.util.NoSuchElementException;
  * array is automatically resized to match the required capacity.
  * <p>
  * Iterating trough the array is more costly than for conventional lists, because elements may be
- * spread through the whole array.
+ * spread through the whole array, so that the position of the next element must be searched
+ * incrementally.
  * 
  * @author preip
  */
@@ -85,10 +89,13 @@ public class IndexedCollection<T> implements Iterable<T> {
 	 * field.
 	 * 
 	 * @param index The index of the element which should be removed.
+	 * @return true if the element was removed, otherwise false
 	 */
-	public void remove(int index) {
-		if (index < _elements.length)
-			_elements[index] = null;
+	public boolean remove(int index) {
+		if (index >= _elements.length || _elements[index] == null)
+			return false;
+		_elements[index] = null;
+		return true;
 	}
 	
 	public Iterator<T> iterator() {

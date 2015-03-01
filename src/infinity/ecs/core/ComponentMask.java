@@ -26,7 +26,6 @@ import java.util.List;
  * leave the mask in a valid state all the time.
  * 
  * @author preip, Simon
- * @version 1.0
  */
 public class ComponentMask {
 	
@@ -203,5 +202,10 @@ public class ComponentMask {
 			return false;
 		ComponentMask mask = (ComponentMask)obj;
 		return _bitArray.equals(mask._bitArray);
+	}
+	
+	@Override
+	public int hashCode() {
+		return _bitArray.hashCode();
 	}
 }

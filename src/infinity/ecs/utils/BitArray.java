@@ -1,5 +1,7 @@
 package infinity.ecs.utils;
 
+import java.util.Arrays;
+
 /**
  * Class that can be used to store the value of an arbitrary number of bits.
  * <p>
@@ -9,8 +11,6 @@ package infinity.ecs.utils;
  * dynamically resized, if a one is set somewhere outside of the current capacity.
  *
  * @author preip
- *
- * ToDo: Implement hashCode in an appropriate manner.
  */
 public class BitArray {
 
@@ -161,11 +161,6 @@ public class BitArray {
 		return _array.length << 5;
 	}
 
-	/**
-	 * Checks if this bit array is equal to the specified object.
-	 *
-	 * @param obj The object this BitArray is compared with.
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
@@ -191,6 +186,11 @@ public class BitArray {
 				return false;
 		// if all remaining bits were zero, both arrays are equal
 		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(_array);
 	}
 
 	/**
