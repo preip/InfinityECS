@@ -1,5 +1,6 @@
 package infinity.ecs.benchmark;
 
+import infinity.ecs.benchmark.core.CoreBenchmark;
 import infinity.ecs.benchmark.messaging.MessagingBenchmark;
 import infinity.ecs.benchmark.utils.UtilBenchmark;
 
@@ -36,6 +37,7 @@ public class App {
 	 */
 	private void setup() {
 		// ADD NEW BENCHMARK ITEMS HERE
+		_items.add(new CoreBenchmark());
 		_items.add(new MessagingBenchmark());
 		_items.add(new UtilBenchmark());
 	}
