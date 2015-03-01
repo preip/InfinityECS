@@ -1,15 +1,12 @@
 package infinity.ecs.core;
 
-import infinity.ecs.exceptions.AlreadyNestedException;
-
-import java.util.HashMap;
-
-import infinity.ecs.exceptions.ComponentAlreadyExistsException;
-import infinity.ecs.utils.ReadOnlyCollection;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import infinity.ecs.exceptions.AlreadyNestedException;
+import infinity.ecs.exceptions.ComponentAlreadyExistsException;
+import infinity.ecs.utils.IndexedCollection;
+import infinity.ecs.utils.ReadOnlyCollection;
 
 /**
  *
@@ -31,7 +28,8 @@ public class Entity {
 	 * A Map containing all Components that belong directly to this Entity, indexed by their
 	 * type. There can only be one Component of a specific ComponentType.
 	 */
-	private final Map<ComponentType, Component> _components;
+	//private final Map<ComponentType, Component> _components;
+	private final IndexedCollection<Component> _components;
 	
 	/**
 	 * The component mask of this entity that indicates which components the entity consists of.
@@ -62,7 +60,7 @@ public class Entity {
 	Entity(int id, Entity parent) {
 		_id = id;
 		_parent = parent;
-		_components = new HashMap<>();
+		_components = new IndexedCollection<Component>();
 		_componentMask = new ComponentMask();
 		_children = new ArrayList<>();
 	}
@@ -91,7 +89,18 @@ public class Entity {
 	 * Component.
 	 */
 	public Component getComponent(ComponentType type) {
-	    return _components.get(type);
+	    return _components.get(type.getId());
+	}
+	
+	public void addComponent(Component component) 
+			throws ComponentAlreadyExistsException, IllegalArgumentException {
+		if (component == null)
+			throw new IllegalArgumentException("The components that should be added to the" +
+				"entity can't be null");
+		int index = component.getComponentType().getId();
+		if (_components.get(index) != null)
+			throw new ComponentAlreadyExistsException();
+		_components.set(index, component);
 	}
 	
 	/**
@@ -104,8 +113,8 @@ public class Entity {
 	 * same type than one of the components that should be added.
 	 * @throws IllegalArgumentException If one of the components that should be added was null.
 	 */
-	void addComponents(Component... components) throws ComponentAlreadyExistsException {
-		for(Component component : components) {
+	public void addComponents(Component... components) throws ComponentAlreadyExistsException {
+		/*for(Component component : components) {
 			if (component == null)
 				throw new IllegalArgumentException("The components that should be added to the" +
 						"entity can't be null");
@@ -117,7 +126,7 @@ public class Entity {
 				    ("The entity already contains an instance of: " + component);
 			_components.put(type, component);
 			_componentMask.add(type);
-		}
+		}*/
 	}
 	
 	/**
@@ -127,8 +136,12 @@ public class Entity {
 	 */
 	void removeComponents(ComponentType... componentTypes) {
 		for (ComponentType cType : componentTypes)
-			if (_components.remove(cType) != null)
+			if (_components.remove(cType.getId()))
 				_componentMask.remove(cType);
+	}
+	
+	public boolean removeComponent(ComponentType type) {
+		return _components.remove(type.getId());
 	}
 	
 	/**

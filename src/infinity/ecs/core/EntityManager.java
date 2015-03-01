@@ -1,12 +1,13 @@
 package infinity.ecs.core;
 
 import infinity.ecs.exceptions.AlreadyNestedException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
 
 import infinity.ecs.utils.IdPool;
+import infinity.ecs.utils.IndexedCollection;
 import infinity.ecs.utils.ReadOnlyCollection;
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
 import infinity.ecs.exceptions.EntityDoesNotExistsException;
@@ -40,7 +41,7 @@ public class EntityManager {
 	/**
 	 * The list of all entities managed by this EntityManager indexed by their IDs. 
 	 */
-	private final HashMap<Integer, Entity> _entities;
+	private final IndexedCollection<Entity> _entities;
 	
 	/**
 	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
@@ -54,9 +55,9 @@ public class EntityManager {
 	/**
 	 * Creates a new instance of the EntityManager class.
 	 */
-	private EntityManager() {
+	public EntityManager() {
 		_idPool = new IdPool();
-		_entities = new HashMap<>();
+		_entities = new IndexedCollection<Entity>();
 		_entitiesByMask = new HashMap<>();
 	}
 	
@@ -83,9 +84,9 @@ public class EntityManager {
 		// NOTE: According to some random benchmarks on the Internet, iterating over the entry sets
 		// is faster than iterating over the sources only. Thats why the whole set is used, but
 		// the key is of no interest for the operation.
-		Iterator<Entry<Integer, Entity>> it = _entities.entrySet().iterator();
+		Iterator<Entity> it = _entities.iterator();
 		while(it.hasNext()) {
-			Entity entity = it.next().getValue();
+			Entity entity = it.next();
 			// check for each entry, if its components match the specified mask
 			if (entity.getComponentMask().contains(mask))
 				result.add(entity);
@@ -101,7 +102,7 @@ public class EntityManager {
 	public Entity createEntity() {
 		int id = _idPool.getId();
 		Entity entity = new Entity(id, null);
-		_entities.put(id, entity);
+		_entities.set(id, entity);
 		return entity;
 	}
 	
@@ -118,9 +119,14 @@ public class EntityManager {
 	    return entity;
 	}
 	
+	public boolean removeEntity(int id) {
+		return _entities.remove(id);
+	}
+	
 	/**
 	 * Adds a new nested Entity to a super Entity, removes the nested Entity from _parentEntities
- and _parentEntitiesByMask
+ 	 * and _parentEntitiesByMask
+ 	 * 
 	 * @param parentEntity
 	 * @param childEntity
 	 * @throws infinity.ecs.exceptions.AlreadyNestedException
@@ -168,9 +174,23 @@ public class EntityManager {
 	 * @param components
 	 * @throws InfinityException 
 	 */
-	public void addComponents(Integer id, Component... components) throws InfinityException{
+	public void addComponents(int id, Component... components) throws InfinityException{
 	    Entity entity = this.getEntity(id);
 	    this.addComponents(entity, components);
+	}
+	
+	public Component getComponent(int id, ComponentType type) {
+		Entity e = _entities.get(id);
+		if (e == null)
+			throw new IllegalStateException();
+		return e.getComponent(type);
+	}
+	
+	public boolean removeComponent(Integer id, ComponentType type) {
+		Entity e = _entities.get(id);
+		if (e == null)
+			throw new IllegalStateException();
+		return e.removeComponent(type);
 	}
 	
 	/**
