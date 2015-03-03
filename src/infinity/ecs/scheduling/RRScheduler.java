@@ -1,5 +1,7 @@
-package infinity.ecs.core;
+package infinity.ecs.scheduling;
 
+import infinity.ecs.core.EntitySystem;
+import infinity.ecs.exceptions.ScheduleIsRunningException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -85,7 +87,9 @@ public class RRScheduler implements Scheduler{
      * @return  
      */
     @Override
-    public boolean registerSystem(EntitySystem system, Integer priority) {
+    public boolean registerSystem(EntitySystem system, Integer priority) 
+	     {
+
 	if(_systems.get(priority) != null)
 	    return false;
 	_systems.add(priority,system);
@@ -93,12 +97,11 @@ public class RRScheduler implements Scheduler{
     }
     
     /**
-     * Runs the schedule until the _runFlag is set to false.
+     * Runs the schedule until the _runFlag is set to false. makeSchedule() needs to be called first
      */
     @Override
     public void run(){
 	_runFlag = true;
-	this.makeSchedule();
 	while(_runFlag) {
 	    while(_index < _schedule.size()){
 		_schedule.get(_index).update(0);
@@ -110,9 +113,12 @@ public class RRScheduler implements Scheduler{
     
     /**
      * Recalculates the schedule.
+     * @throws ScheduleIsRunningException
      */
     @Override
-    public void makeSchedule(){
+    public void makeSchedule()throws ScheduleIsRunningException{
+	if(_runFlag)
+	    throw new ScheduleIsRunningException();
 	_schedule = new ArrayList<>();
 	_index = 0;
 	Iterator<EntitySystem> iter = _systems.iterator();

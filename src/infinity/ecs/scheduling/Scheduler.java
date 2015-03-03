@@ -1,4 +1,7 @@
-package infinity.ecs.core;
+package infinity.ecs.scheduling;
+
+import infinity.ecs.core.EntitySystem;
+import infinity.ecs.exceptions.ScheduleIsRunningException;
 
 /**
  *
@@ -17,8 +20,9 @@ public interface Scheduler {
     
     /**
      * Recalculates the schedule.
+     * @throws ScheduleIsRunningException
      */
-    public abstract void makeSchedule();
+    public abstract void makeSchedule() throws ScheduleIsRunningException;
     
     /**
      * Adds a EntitySystem to the Schedule.
@@ -26,7 +30,7 @@ public interface Scheduler {
      * @param parameter
      * @return
      */
-    public abstract boolean registerSystem(EntitySystem system,Integer parameter);
+    public abstract boolean registerSystem(EntitySystem system,Integer parameter) ;
     
     /**
      * Removes a EntitySystem from the schedule. 
