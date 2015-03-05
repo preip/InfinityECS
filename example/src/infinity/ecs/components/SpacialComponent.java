@@ -3,7 +3,7 @@ package infinity.ecs.components;
 import infinity.ecs.core.Component;
 import infinity.ecs.core.ComponentType;
 
-public class SpacialComponent implements Component {
+public class SpacialComponent extends Component {
 
 	public float xPos;
 	public float yPos;
@@ -31,11 +31,6 @@ public class SpacialComponent implements Component {
 		xScale = 1;
 		yScale = 1;
 		zScale = 1;
-	}
-	
-	@Override
-	public ComponentType getComponentType() {
-		return ComponentType.get(this.getClass());
 	}
 	
 }
