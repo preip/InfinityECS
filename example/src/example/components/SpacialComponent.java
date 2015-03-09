@@ -1,4 +1,4 @@
-package infinity.ecs.components;
+package example.components;
 
 import infinity.ecs.core.*;
 
