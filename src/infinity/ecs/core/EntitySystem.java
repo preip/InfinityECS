@@ -36,7 +36,7 @@ public abstract class EntitySystem {
 	/**
 	 * Updates this system.
 	 * 
-	 * @param ellapsedTime The time which has elapsed since the last update.
+	 * @param elapsedTime The time which has elapsed since the last update.
 	 */
 	public abstract void update(int elapsedTime);
 	

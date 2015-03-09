@@ -17,7 +17,7 @@ public class ReadOnlyMap<K,V> {
 	private final Map<K,V> _source;
 	
 	/**
-	 * Creates a new instance of a ReadOnlyMap<K,V> 
+	 * Creates a new instance of a ReadOnlyMap&#60;K,V&#62; 
 	 * @param source the source map
 	 * @throws NullPointerException is thrown when the source is null.
 	 */

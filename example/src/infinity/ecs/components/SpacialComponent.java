@@ -1,7 +1,6 @@
 package infinity.ecs.components;
 
-import infinity.ecs.core.Component;
-import infinity.ecs.core.ComponentType;
+import infinity.ecs.core.*;
 
 public class SpacialComponent extends Component {
 
@@ -18,7 +17,8 @@ public class SpacialComponent extends Component {
 	public float yScale;
 	public float zScale;
 	
-	public SpacialComponent() {
+	public SpacialComponent(Entity entity) {
+		super(entity);
 		xPos = 0;
 		yPos = 0;
 		zPos = 0;
@@ -32,5 +32,4 @@ public class SpacialComponent extends Component {
 		yScale = 1;
 		zScale = 1;
 	}
-	
 }

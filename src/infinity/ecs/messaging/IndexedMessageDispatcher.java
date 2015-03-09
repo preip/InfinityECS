@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link MessageDispatcher} which uses an internal map to index the {@link MesssageType}s of
+ * A {@link MessageDispatcher} which uses an internal map to index the {@link MessageType}s of
  * every associated endpoint.
  * <p>
  * <b>Notes:</b><br>

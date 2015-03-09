@@ -133,7 +133,7 @@ public final class ComponentType {
 	 * Checks if this {@link ComponentType} is equal to the specified object.
 	 *
 	 * @param obj The object this {@link ComponentType} is compared with.
-	 * @return 
+	 * @return true if equal
 	 */
 	@Override
 	public boolean equals(Object obj) {

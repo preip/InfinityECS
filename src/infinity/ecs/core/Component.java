@@ -17,7 +17,7 @@ public abstract class Component {
 	 * Creates a new instance of the {@link Component} class.
 	 * 
 	 * @param entity The {@link Entity} which this {@link Component} is part of.
-	 * @throws IllegalStateException when the entity is <i>null</i7>.
+	 * @throws IllegalStateException when the entity is <i>null</i>.
 	 */
 	protected Component(Entity entity) throws IllegalStateException {
 		if (entity == null)

@@ -69,8 +69,7 @@ public class IndexedMessageEndpoint implements MessageEndpoint {
 	 * Registers the specified message type with this endpoint. The endpoint will now receive all
 	 * messages of the specified type until the type is derigstered again.
 	 * 
-	 * @param msgType The {@link MessageType} which should be registered.
-	 * @throws IllegalStateException when the endpoint has been terminated.
+	 * @param type IllegalStateException when the endpoint has been terminated.
 	 */
 	public void register(MessageType type) throws IllegalStateException {
 		if (_isTerminated)
@@ -82,7 +81,7 @@ public class IndexedMessageEndpoint implements MessageEndpoint {
 	 * Deregisters the specified message type with this endpoint. The endpoint will no longer
 	 * receive any messages of the specified type.
 	 * 
-	 * @param msgType The {@link MessageType} which should be deregistered.
+	 * @param type The {@link MessageType} which should be deregistered.
 	 * @throws IllegalStateException when the endpoint has been terminated.
 	 */
 	public void deregister(MessageType type) throws IllegalStateException {

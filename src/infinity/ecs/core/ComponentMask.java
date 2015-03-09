@@ -9,11 +9,11 @@ import java.util.List;
 
 /**
  * Can be used to create an immutable mask that resembles a group of several types of
- * {@link component}s. Can be compared to other masks to find matches etc.
+ * {@link Component}s. Can be compared to other masks to find matches etc.
  * <p>
  * <b>Notes:</b><br>
  * Tight wrapper around {@link BitArray} class. Should be used by {@link Entity}s and
- * {@link EntitySystem}s to check if an entity contains the {@link component}s required by the
+ * {@link EntitySystem}s to check if an entity contains the {@link Component}s required by the
  * system.
  * <p>
  * Manipulation of the masks after their initial creation is only allowed by core members. This
@@ -129,9 +129,9 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Checks, if the {@link ComponentMask} contains all specified {@link ComponentTypes}.
+	 * Checks, if the {@link ComponentMask} contains all specified {@link ComponentType}.
 	 * 
-	 * @param componentTypes The {@link ComponentTypes} which should be checked.
+	 * @param componentTypes The {@link ComponentType} which should be checked.
 	 * @return true if the mask contains all specified types, otherwise false.
 	 */
 	public boolean contains(ComponentType... componentTypes) {
@@ -152,10 +152,10 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Checks if this  {@link ComponentMask} contains at least one of the types in the specified
+	 * Checks if these  {@link ComponentType} contains at least one of the types in the specified
 	 * list.
 	 * 
-	 * @param mask The mask which should be checked.
+	 * @param componentTypes The ComponentTypes that should be checked.
 	 * @return True if this mask contains a least one of the types in the specified list,
 	 * otherwise false.
 	 */
@@ -179,9 +179,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Gets a list of all {@link ComponentTypes} that are part of the mask.
+	 * Gets a list of all {@link ComponentType} that are part of the mask.
 	 * 
-	 * @return The list of all {@link ComponentTypes}.
+	 * @return The list of all {@link ComponentType}.
 	 */
 	public List<ComponentType> getComponentTypes() {
 		ArrayList<ComponentType> result = new ArrayList<ComponentType>();

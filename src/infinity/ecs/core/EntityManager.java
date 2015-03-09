@@ -108,7 +108,7 @@ public class EntityManager {
 	/**
 	 * 
 	 * @param id The unique id of the Entity requested.
-	 * @return
+	 * @return 
 	 * @throws EntityDoesNotExistsException 
 	 */
 	public Entity getEntity(Integer id) throws EntityDoesNotExistsException {
