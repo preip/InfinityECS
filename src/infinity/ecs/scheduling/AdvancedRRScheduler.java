@@ -40,7 +40,7 @@ public class AdvancedRRScheduler implements Scheduler {
     /**
      * The only instance of the RRScheduler.
      */
-    private final static AdvancedRRScheduler _instance = new AdvancedRRScheduler();
+    private static AdvancedRRScheduler _instance = new AdvancedRRScheduler();
     
     /**
      * RRScheduler is a singelton, so the constructor needs to be private.
@@ -226,5 +226,12 @@ system A is 1 and the of B is 5, than A runs every frame and B at least every 5t
 	    }
 	}    
 	return resultList;
+    }
+    
+    /**
+     * Discards the current instance of the Scheduler and creates a new one.
+     */
+    public void newInstance(){
+	_instance = new AdvancedRRScheduler();
     }
 }

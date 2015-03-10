@@ -36,7 +36,7 @@ public class RRScheduler implements Scheduler{
     /**
      * The only instance of the RRScheduler.
      */
-    private final static RRScheduler _instance = new RRScheduler();
+    private static RRScheduler _instance = new RRScheduler();
     
     /**
      * RRScheduler is a singelton, so the constructor needs to be private.
@@ -125,5 +125,12 @@ public class RRScheduler implements Scheduler{
 	while(iter.hasNext()){
 	    _schedule.add(iter.next());
 	}	  
+    }
+    
+    /**
+     * Discards the current instance of the Scheduler and creates a new one.
+     */
+    public void newInstance(){
+	_instance = new RRScheduler();
     }
 }
