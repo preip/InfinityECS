@@ -33,6 +33,11 @@ public class AdvancedRRScheduler implements Scheduler {
     private int _index; 
     
     /**
+     * The current amount of runs since the start.
+     */
+    private int _runs;
+    
+    /**
      * Is used to end the main loop.
      */
     private boolean _runFlag;
@@ -40,10 +45,10 @@ public class AdvancedRRScheduler implements Scheduler {
     /**
      * The only instance of the RRScheduler.
      */
-    private final static AdvancedRRScheduler _instance = new AdvancedRRScheduler();
+    private static AdvancedRRScheduler _instance = new AdvancedRRScheduler();
     
     /**
-     * RRScheduler is a singelton, so the constructor needs to be private.
+     * RRScheduler is a singleton, so the constructor needs to be private.
      */
     private AdvancedRRScheduler(){
 	_index = 0;
@@ -60,12 +65,13 @@ public class AdvancedRRScheduler implements Scheduler {
     }
     
     /**
-     * Ends the main loop in run() and sets the execution index back to 0.
+     * Ends the main loop in run() and sets the execution index and runs back to 0.
      */
     @Override
     public void end(){
 	_runFlag = false; 
 	_index = 0;
+	_runs = 0;
     }
     
     /**
@@ -118,7 +124,11 @@ system A is 1 and the of B is 5, than A runs every frame and B at least every 5t
 		_schedule.get(_index).update(1);
 		_index += 1;
 	    }
+	    _runs += 1;
 	    _index = 0;
+	    //Catches the overflow
+	    if(_runs == Integer.MAX_VALUE)
+		_runs = 0; 
 	}
     }
     
@@ -226,5 +236,31 @@ system A is 1 and the of B is 5, than A runs every frame and B at least every 5t
 	    }
 	}    
 	return resultList;
+    }
+    
+    /**
+     * Discards the current instance of the Scheduler and creates a new one.
+     */
+    public void newInstance(){
+	_instance = new AdvancedRRScheduler();
+    }
+    
+    
+    /**
+     * Returns how often the schedule was executed since the start.
+     * @return 
+     */
+    @Override
+    public int getRuns(){
+	return _runs;
+    }
+    
+    /**
+     * True if the schedule is currently running.
+     * @return 
+     */
+    @Override
+    public boolean isRunning(){
+	return _runFlag;
     }
 }

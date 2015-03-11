@@ -3,7 +3,9 @@ package infinity.ecs.scheduling;
 import infinity.ecs.core.EntitySystem;
 import infinity.ecs.exceptions.ScheduleIsRunningException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * This class is a very simple RoundRobin-Scheduler. The ECSSystems are executed according to their
@@ -21,12 +23,17 @@ public class RRScheduler implements Scheduler{
     /**
      * Contains all systems that need to be scheduled mapped to their priority.
      */
-    private final ArrayList<EntitySystem> _systems;
-    
+    private final SortedMap<Integer,ArrayList<EntitySystem>> _systems;
+      
     /**
      * The current Index of the Execution. Is needed if you want to pause the main loop.
      */
-    private int _index; 
+    private int _index;
+    
+    /**
+     * The current amount of runs since the start.
+     */
+    private int _runs;
     
     /**
      * Is used to end the main loop.
@@ -34,34 +41,22 @@ public class RRScheduler implements Scheduler{
     private boolean _runFlag;
     
     /**
-     * The only instance of the RRScheduler.
+     * RRScheduler is a singleton, so the constructor needs to be private.
      */
-    private final static RRScheduler _instance = new RRScheduler();
-    
-    /**
-     * RRScheduler is a singelton, so the constructor needs to be private.
-     */
-    private RRScheduler(){
+    public RRScheduler(){
 	_index = 0;
 	_schedule = new ArrayList<>();
-	_systems = new ArrayList<>();
+	_systems = new TreeMap<>();
     } 
-	
-    /**
-     * 
-     * @return The only instance of RRScheduler. 
-     */
-    public static RRScheduler getInstance() {
-	    return _instance;
-    }
     
     /**
-     * Ends the main loop in run() and sets the execution index back to 0.
+     * Ends the main loop in run() and sets the execution index and runs back to 0.
      */
     @Override
     public void end(){
 	_runFlag = false; 
 	_index = 0;
+	_runs = 0;
     }
     /**
      * Stops the main loop in run(), if run() is called again the schedule resumes where it was stopped.
@@ -76,24 +71,31 @@ public class RRScheduler implements Scheduler{
      */
     @Override
     public boolean removeSystem(EntitySystem system){
-	return _systems.remove(system);
+	Collection<Integer> keys = _systems.keySet();
+	for(Integer key : keys){
+	    if(_systems.remove(key, system))
+		return true;
+	}
+	return false;
     }
     
     /**
      * Registers the system in the Scheduler.
      * @param system
      * @param priority The priority of each System must be unique, if a second system with the same 
-     * priority is registered nothing happens. The highest priority is 0.
+     * priority is registered nothing happens. The highest priority is 1. The priority must be >0
      * @return  
      */
     @Override
-    public boolean registerSystem(EntitySystem system, Integer priority) 
-	     {
-
-	if(_systems.get(priority) != null)
+    public boolean registerSystem(EntitySystem system, Integer priority) {
+	if(priority <= 0)
 	    return false;
-	_systems.add(priority,system);
-	return true;
+	ArrayList<EntitySystem> list = _systems.get(priority);
+	if(list == null) {
+	    list = new ArrayList<>();
+	    _systems.put(priority, list);
+	}
+	return list.add(system);
     }
     
     /**
@@ -107,7 +109,11 @@ public class RRScheduler implements Scheduler{
 		_schedule.get(_index).update(0);
 		_index += 1;
 	    }
+	    _runs += 1;
 	    _index = 0;
+	    //Catches the overflow
+	    if(_runs == Integer.MAX_VALUE)
+		_runs = 0; 
 	}
     }
     
@@ -121,9 +127,28 @@ public class RRScheduler implements Scheduler{
 	    throw new ScheduleIsRunningException();
 	_schedule = new ArrayList<>();
 	_index = 0;
-	Iterator<EntitySystem> iter = _systems.iterator();
-	while(iter.hasNext()){
-	    _schedule.add(iter.next());
-	}	  
+	Collection<Integer> keys = _systems.keySet();
+	for(Integer key : keys){
+	    _schedule.addAll(_systems.get(key));
+	}
     }
+    
+    /**
+     * Returns how often the schedule was executed since the start.
+     * @return 
+     */
+    @Override
+    public int getRuns(){
+	return _runs;
+    }
+    
+    /**
+     * True if the schedule is currently running.
+     * @return 
+     */
+    @Override
+    public boolean isRunning(){
+	return _runFlag;
+    }
+    
 }
