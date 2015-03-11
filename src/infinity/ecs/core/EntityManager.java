@@ -29,6 +29,7 @@ public class EntityManager {
 	/**
 	 * The only instance of the EntityManager.
 	 * TODO: Why is EntityManager a Singleton???
+	 * --> Singleton or Static what ever you prefer
 	 */
 	private static final EntityManager _instance = new EntityManager();
 	
@@ -153,8 +154,6 @@ public class EntityManager {
 	    ArrayList<Entity> componentMaskList = _entitiesByMask.get(componentMask);
 	    if(componentMaskList != null)
 	    	componentMaskList.remove(entity);
-	    
-	    entity.addComponents(components);
 	    
 	    componentMaskList = _entitiesByMask.get(entity.getComponentMask());
 	    if(componentMaskList == null)

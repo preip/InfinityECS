@@ -7,10 +7,11 @@ import infinity.ecs.exceptions.ScheduleIsRunningException;
  *
  * @author Simon
  */
-public interface Scheduler {   
+public interface Scheduler extends Runnable {   
     /**
      * Runs the schedule.
      */
+    @Override
     public abstract void run();
     
     /**
@@ -39,4 +40,15 @@ public interface Scheduler {
      */
     public abstract boolean removeSystem(EntitySystem system);
     
+    /**
+     * Returns how often the schedule was executed since the start.
+     * @return 
+     */
+    public abstract int getRuns();
+ 
+    /**
+     * True if the schedule is currently running.
+     * @return 
+     */
+    public abstract boolean isRunning();
 }
