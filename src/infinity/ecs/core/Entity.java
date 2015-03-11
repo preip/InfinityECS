@@ -1,22 +1,15 @@
 package infinity.ecs.core;
 
 import infinity.ecs.exceptions.AlreadyNestedException;
-
-import java.util.HashMap;
-
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
 import infinity.ecs.utils.ReadOnlyCollection;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author preip, Simon
  * @version 0.1
  */
-public class Entity {
+public final class Entity {
 	
 	//----------------------------------------------------------------------------------------------
 	// Fields
@@ -27,27 +20,7 @@ public class Entity {
 	 */
 	private final int _id;
 
-	/**
-	 * A Map containing all Components that belong directly to this Entity, indexed by their
-	 * type. There can only be one Component of a specific ComponentType.
-	 */
-	private final Map<ComponentType, Component> _components;
-	
-	/**
-	 * The component mask of this entity that indicates which components the entity consists of.
-	 */
-	private final ComponentMask _componentMask;
-	
-	/**
-	 * A list of all nested entities of this entity.  
-	 */
-	private final List<Entity> _children;
-	
-	/**
-	 * If the Entity is nested this field contains the super Entity. Should only be set by the
-	 * EntityManager and is therefore package private.
-	 */
-	private Entity _parent;
+	private final EntityManager _em;
 	
 	//----------------------------------------------------------------------------------------------
 	// Constructor
@@ -59,12 +32,9 @@ public class Entity {
 	 * to be unique
 	 * @param id The unique id of the entity.
 	 */
-	Entity(int id, Entity parent) {
+	Entity(int id, EntityManager em) {
 		_id = id;
-		_parent = parent;
-		_components = new HashMap<>();
-		_componentMask = new ComponentMask();
-		_children = new ArrayList<>();
+		_em = em;
 	}
 	
 	//----------------------------------------------------------------------------------------------
@@ -83,52 +53,34 @@ public class Entity {
 	// Component related methods
 	//----------------------------------------------------------------------------------------------
 	
-	/**
-	 * Gets the Component of the specified Type.
-	 * 
-	 * @param type the Type of the Component.
-	 * @return the Component of the specified ComponentType or null if there was no matching
-	 * Component.
-	 */
-	public Component getComponent(ComponentType type) {
-	    return _components.get(type);
+	public Component addComponent(ComponentType componentType)
+			throws IllegalArgumentException, ComponentAlreadyExistsException {
+		return _em.addComponent(this, componentType);
+	}
+	
+	public void addComponents(ComponentType... componentTypes)
+			throws IllegalArgumentException, ComponentAlreadyExistsException {
+		_em.addComponents(this, componentTypes);
 	}
 	
 	/**
-	 * Adds new components to the entity, components should only be added by the EntityManager.
-	 * TODO: Think about which exception can happen and which not, if this method is only called
-	 * by the EntityManager
+	 * Gets the {@link Component} of the specified {@link ComponentType}.
 	 * 
-	 * @param components The components that should be added.
-	 * @throws ComponentAlreadyExistsException If the entity already contains a component of the
-	 * same type than one of the components that should be added.
-	 * @throws IllegalArgumentException If one of the components that should be added was null.
+	 * @param componentType the Type of the {@link Component}.
+	 * @return the {@link Component} of the specified {@link ComponentType} or null if there was
+	 * 		no matching {@link Component}.
 	 */
-	void addComponents(Component... components) throws ComponentAlreadyExistsException {
-		for(Component component : components) {
-			if (component == null)
-				throw new IllegalArgumentException("The components that should be added to the" +
-						"entity can't be null");
-			ComponentType type = ComponentType.get(component);
-			Component duplicate = _components.get(type);
-			// throws an Exception if the Entity already has a Component of the specified type
-			if (duplicate != null)
-				throw new ComponentAlreadyExistsException
-				    ("The entity already contains an instance of: " + component);
-			_components.put(type, component);
-			_componentMask.add(type);
-		}
+	public Component getComponent(ComponentType componentType) {
+		return _em.getComponent(this, componentType);
 	}
 	
 	/**
 	 * Removes the components of the specified types from this entity.
 	 * 
-	 * @param componentTypes The types of the components which should be removed.
+	 * @param componentType The type of the {@link Component} which should be removed.
 	 */
-	void removeComponents(ComponentType... componentTypes) {
-		for (ComponentType cType : componentTypes)
-			if (_components.remove(cType) != null)
-				_componentMask.remove(cType);
+	public boolean removeComponents(ComponentType componentType) {
+		return _em.removeComponent(this, componentType);
 	}
 	
 	/**
@@ -137,7 +89,7 @@ public class Entity {
 	 * @return The ComponentMask.
 	 */
 	public ComponentMask getComponentMask() {
-		return _componentMask;
+		return _em.getComponentMask(this);
 	}
 	
 	//----------------------------------------------------------------------------------------------
@@ -149,26 +101,19 @@ public class Entity {
 	 * 
 	 * @return True if this Entity is the child of another entity, otherwise false.
 	 */
-	public boolean isChild(){
-	    return (_parent != null);
+	public boolean hasParent(){
+	    return _em.getParent(this) != null;
 	}
 	
 	/**
 	 * Adds the specified child to this entity.
-	 * TODO: Think about which exception can happen and which not, if this method is only called
-	 * by the EntityManager
 	 * 
 	 * @param childEntity The child that should be added.
 	 * @throws AlreadyNestedException Is thrown when nestedEntity is already nested.
 	 * @throws IllegalArgumentException When the entity is added as a child to itself.
 	 */
-	void addChildEntity(Entity child) throws AlreadyNestedException{
-	    if(this == child)
-	    	throw new IllegalArgumentException("Can't add the entity as a child to itself.");
-	    if(child.isChild())
-	    	throw new AlreadyNestedException("This Entity is already nested");
-	    child._parent = this;
-	    _children.add(child);
+	public void addChildEntity(Entity child) throws AlreadyNestedException{
+	    _em.addChildEntity(this, child);
 	}
 	
 	/**
@@ -176,9 +121,8 @@ public class Entity {
 	 * 
 	 * @param child The child that should be removed.
 	 */
-	void removeChildEntity(Entity child) {
-	    if (_children.remove(child))
-	    	child._parent = null;
+	public boolean removeChildEntity(Entity child) {
+	    return _em.removeChildEntity(this, child);
 	}
 	
 	/**
@@ -186,9 +130,13 @@ public class Entity {
 	 * @return The ReadOnlyCollection of all children.
 	 */
 	public ReadOnlyCollection<Entity> getChildEntities() {
-	    return new ReadOnlyCollection<Entity>(_children);
+	    return _em.getChildren(this);
 	}
 
+	//----------------------------------------------------------------------------------------------
+	// Miscellaneous methods
+	//----------------------------------------------------------------------------------------------
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

@@ -17,8 +17,7 @@ public class SpacialComponent extends Component {
 	public float yScale;
 	public float zScale;
 	
-	public SpacialComponent(Entity entity) {
-		super(entity);
+	public SpacialComponent() {
 		xPos = 0;
 		yPos = 0;
 		zPos = 0;

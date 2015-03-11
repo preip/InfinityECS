@@ -1,24 +1,20 @@
 package infinity.ecs.core;
 
-import infinity.ecs.exceptions.AlreadyNestedException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.List;
 
 import infinity.ecs.utils.IdPool;
+import infinity.ecs.utils.IndexedCollection;
 import infinity.ecs.utils.ReadOnlyCollection;
+import infinity.ecs.exceptions.AlreadyNestedException;
 import infinity.ecs.exceptions.ComponentAlreadyExistsException;
 import infinity.ecs.exceptions.EntityDoesNotExistsException;
-import infinity.ecs.exceptions.InfinityException;
 
 /**
- * Class which manages a set of entities. It can be used to create new entities with unique IDs,
- * add new components to an entity, get lists of entities which match a specific component mask
- * etc.  
+ * Class which manages a set of {@link Entity}s. It can be used to create new entities with unique
+ * IDs, add new {@link Component}s to an entity, etc.  
  * 
  * @author preip, simon
- * @version 0.1
  */
 public class EntityManager {
 	
@@ -27,72 +23,49 @@ public class EntityManager {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * The only instance of the EntityManager.
-	 * TODO: Why is EntityManager a Singleton???
-	 */
-	private static final EntityManager _instance = new EntityManager();
-	
-	/**
 	 * The IdPool used by this entity manager to generate IDs for new entities.
 	 */
 	private final IdPool _idPool;
 	
 	/**
-	 * The list of all entities managed by this EntityManager indexed by their IDs. 
+	 * The list of all entities managed by this {@link EntityManager} indexed by their IDs. 
 	 */
-	private final HashMap<Integer, Entity> _entities;
+	private final IndexedCollection<Entity> _entities;
+	
+	private final IndexedCollection<Entity> _parents;
+	
+	private final IndexedCollection<List<Entity>> _children;
 	
 	/**
-	 * A mapping of a specific components mask and a list of all entities which contain that mask. 
+	 * The list of the {@link Component}s of all entities, indexed by the id of the entity and the
+	 * id of the {@link ComponentType}. 
 	 */
-	private final HashMap<ComponentMask, ArrayList<Entity>> _entitiesByMask;
+	private final IndexedCollection<IndexedCollection<Component>> _components;
+	
+	private final IndexedCollection<ComponentMask> _componentMasks;
+	
+	private final IndexedCollection<ComponentFactory> _factories;
 
 	//----------------------------------------------------------------------------------------------
 	// Constructors
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Creates a new instance of the EntityManager class.
+	 * Creates a new instance of the {@link EntityManager} class.
 	 */
-	private EntityManager() {
+	public EntityManager() {
 		_idPool = new IdPool();
-		_entities = new HashMap<>();
-		_entitiesByMask = new HashMap<>();
+		_entities = new IndexedCollection<Entity>();
+		_parents = new IndexedCollection<Entity>();
+		_children = new IndexedCollection<List<Entity>>();
+		_components = new IndexedCollection<IndexedCollection<Component>>();
+		_componentMasks = new IndexedCollection<ComponentMask>();
+		_factories = new IndexedCollection<ComponentFactory>();
 	}
 	
 	//----------------------------------------------------------------------------------------------
-	// Methods
+	// Entity related methods
 	//----------------------------------------------------------------------------------------------
-	
-	/**
-	 * 
-	 * @return The only instance of EntityManager.
-	 */
-	public static EntityManager getEntityManager() {
-	    return _instance;
-	}
-	
-	/**
-	 * Creates a list of all entities that contain the specified component mask.
-	 * NOTE: The list is only created and not added to anything.
-	 * @param mask The mask for which the list should be created.
-	 * @return The resulting list of entities that contain the mask.
-	 */
-	private ArrayList<Entity> createNewEntityListByMask(ComponentMask mask) {
-		ArrayList<Entity> result = new ArrayList<>();
-		// NOTE: According to some random benchmarks on the Internet, iterating over the entry sets
-		// is faster than iterating over the sources only. Thats why the whole set is used, but
-		// the key is of no interest for the operation.
-		Iterator<Entry<Integer, Entity>> it = _entities.entrySet().iterator();
-		while(it.hasNext()) {
-			Entity entity = it.next().getValue();
-			// check for each entry, if its components match the specified mask
-			if (entity.getComponentMask().contains(mask))
-				result.add(entity);
-		}
-		return result;
-	}
-	
 	
 	/**
 	 * Creates a new, empty Entity with a unique ID.
@@ -100,105 +73,209 @@ public class EntityManager {
 	 */
 	public Entity createEntity() {
 		int id = _idPool.getId();
-		Entity entity = new Entity(id, null);
-		_entities.put(id, entity);
+		Entity entity = new Entity(id, this);
+		_entities.set(id, entity);
+		_children.set(id, new ArrayList<Entity>());
+		_components.set(id, new IndexedCollection<Component>());
+		_componentMasks.set(id, new ComponentMask());
 		return entity;
 	}
 	
 	/**
+	 * Tries to get the {@link Entity} with the specified id.
 	 * 
-	 * @param id The unique id of the Entity requested.
-	 * @return 
-	 * @throws EntityDoesNotExistsException 
+	 * @param id The unique id of the {@link Entity} requested.
+	 * @return The desired {@link Entity} or <i>null</i> if it was not found.
 	 */
 	public Entity getEntity(Integer id) throws EntityDoesNotExistsException {
-	    Entity entity = _entities.get(id);
-	    if(entity == null)
-	    	throw new EntityDoesNotExistsException();
-	    return entity;
+		Entity entity = _entities.get(id);
+		if(entity == null)
+			throw new EntityDoesNotExistsException();
+		return entity;
 	}
 	
 	/**
+	 * Removes the specified {@link Entity} from this {@link EntityManager}.
+	 * @param entity The {@link Entity} which should be removed.
+	 * @return true if the {@link Entity} was removed, otherwise false.
+	 */
+	public boolean removeEntity(Entity entity) {
+		int eId = entity.getId();
+		if (_entities.remove(eId)) {
+			_components.remove(eId);
+			_componentMasks.remove(eId);
+			// TODO: Remove all children too
+			return true;
+		}
+		return false;
+	}
+		
+	//----------------------------------------------------------------------------------------------
+	// Child-/Parent-Entity related methods
+	//----------------------------------------------------------------------------------------------
+	
+	/**
 	 * Adds a new nested Entity to a super Entity, removes the nested Entity from _parentEntities
- and _parentEntitiesByMask
-	 * @param parentEntity
-	 * @param childEntity
+	 * and _parentEntitiesByMask
+	 * 
+	 * @param parent
+	 * @param child
 	 * @throws infinity.ecs.exceptions.AlreadyNestedException
 	 */
-	public void addChildEntity(Entity parentEntity, Entity childEntity)
-			throws AlreadyNestedException {
-	    parentEntity.addChildEntity(childEntity);
+	public void addChildEntity(Entity parent, Entity child)
+			throws IllegalArgumentException, AlreadyNestedException {
+		List<Entity> tChilds = _children.get(parent.getId());
+		if (tChilds == null)
+			throw new IllegalArgumentException();
+		if (_parents.get(child.getId()) != null)
+			throw new AlreadyNestedException();
+		tChilds.add(child);
+		_parents.set(child.getId(), parent);
 	}
 	
 	/**
 	 * Removes a nested Entity from a super Entity, adds the nested Entity to _parentEntities and
- _superEntititesByMask.
+	 * _superEntititesByMask.
+	 * 
 	 * @param parentEntity
 	 * @param childEntity 
 	 */
-	public void removeChildEntity(Entity parentEntity, Entity childEntity) {
-	    parentEntity.removeChildEntity(childEntity);
-	}
-	
-	/**
-	 * Adds new Components to a Entity and updates _entitiesByMask.
-	 * @param entity
-	 * @param components
-	 * @throws ComponentAlreadyExistsException 
-	 */
-	public void addComponents(Entity entity, Component... components) 
-		throws ComponentAlreadyExistsException {
-	    entity.addComponents(components);
-	    ComponentMask componentMask = entity.getComponentMask();
-	    ArrayList<Entity> componentMaskList = _entitiesByMask.get(componentMask);
-	    if(componentMaskList != null)
-	    	componentMaskList.remove(entity);
-	    
-	    entity.addComponents(components);
-	    
-	    componentMaskList = _entitiesByMask.get(entity.getComponentMask());
-	    if(componentMaskList == null)
-	    	componentMaskList = new ArrayList<>();
-	    componentMaskList.add(entity);
-	}
-	
-	/**
-	 * Adds new Components to an Entity and updates _entitiesByMask.
-	 * @param id
-	 * @param components
-	 * @throws InfinityException 
-	 */
-	public void addComponents(Integer id, Component... components) throws InfinityException{
-	    Entity entity = this.getEntity(id);
-	    this.addComponents(entity, components);
-	}
-	
-	/**
-	 * Gets all entities that contain the components defined by the specified mask.
-	 * @param mask The mask for which an entity list should be got.
-	 * @return The resulting list of entities which match the mask.
-	 */
-	public ReadOnlyCollection<Entity> getMatchingEntities(ComponentMask mask) {
-		// try to get the entity list from the stored ones
-		ArrayList<Entity> list = _entitiesByMask.get(mask);
-		// if a query for the specified mask was not already in storage, create a new one and
-		// save it for further queries
-		if (list == null) {
-			list = createNewEntityListByMask(mask);
-			// Clone the mask, so changes to the original mask won't change the index mask
-			// (which would probably screw up the index)
-			_entitiesByMask.put(new ComponentMask(mask), list);
+	public boolean removeChildEntity(Entity parent, Entity child)
+			throws IllegalArgumentException {
+		List<Entity> tChilds = _children.get(parent.getId());
+		if (tChilds == null)
+			throw new IllegalArgumentException();
+		if (tChilds.remove(child)) {
+			_parents.remove(child.getId());
+			return true;
 		}
-		// finally, return not the list itself but a read only variant to prevent modifications
-		// NOTE: if every call of this method would result in a new list being created, there
-		// would be no need for a read only collection, but that would be sub-optimal from a
-		// performance point of view. So would cloning the existing list. Therefore a read only
-		// collection seems the way to go.
-		// TODO: It would be even better to store a single ReadOnlyCollection instance for each
-		// list in the first place, instead if creating a new one every time. While the overhead
-		// from creating a new collection should be minimal, its an overhead nonetheless and the
-		// collection is read only anyway, so there would be no harm in handing each caller the
-		// same instance.
-		return new ReadOnlyCollection<>(list);
+		return false;
+	}
+	
+	public Entity getParent(Entity entity) {
+		return _parents.get(entity.getId());
+	}
+	
+	public ReadOnlyCollection<Entity> getChildren(Entity entity) {
+		List<Entity> tChilds = _children.get(entity.getId());
+		if (tChilds == null)
+			throw new IllegalArgumentException();
+		return new ReadOnlyCollection<>(tChilds);
+	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Component related methods
+	//----------------------------------------------------------------------------------------------
+	
+	/**
+	 * Registers the specified {@link ComponentFactory} with this {@link EntityManager}. All
+	 * {@link Component}s of the {@link ComponentType} specified by the factory are now constructed
+	 * by that factory. Any previously existing factories for the same type are overridden.
+	 * 
+	 * @param factory The {@link ComponentFactory} which should be registered.
+	 * @throws IllegalArgumentException when factory was null.
+	 */
+	public void registerComponentFactory(ComponentFactory factory)
+			throws IllegalArgumentException {
+		if (factory == null)
+			throw new IllegalArgumentException();
+		int id = factory.getComponentType().getId();
+		_factories.set(id, factory);
+	}
+	
+	/**
+	 * Adds a new {@link Component} of the specified type to the specified {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} to which the {@link Component} should be added.
+	 * @param componentType The type of the {@link Component} that should be added.
+	 * @return The {@link Component} which has been created.
+	 * @throws IllegalArgumentException When the specified {@link Entity} was not part of this
+	 * 		{@link EntityManager} or if a new instance of the specified type of {@link Component}
+	 * 		could not be constructed.
+	 * @throws ComponentAlreadyExistsException when the {@link Component} which should be added is
+	 * 		already part of the {@link Entity}.
+	 */
+	public Component addComponent(Entity entity, ComponentType componentType)
+			throws IllegalArgumentException, ComponentAlreadyExistsException {
+		int eId = entity.getId();
+		// try to get the list of all components for the specified entity
+		IndexedCollection<Component> ec = _components.get(eId);
+		if (ec == null)
+			throw new IllegalArgumentException();
+		
+		int cId = componentType.getId();
+		// check if there is already a component of the same type
+		if (ec.get(cId) != null)
+			throw new ComponentAlreadyExistsException();
+		// try to get the factory which constructs components of the specified type
+		ComponentFactory fac = _factories.get(cId);
+		if (fac == null)
+			throw new IllegalArgumentException();
+		
+		Component c = fac.createNewComponent();
+		ec.set(cId, c);
+		c.bind(entity);
+		_componentMasks.get(eId).add(componentType);
+		return c;
+	}
+	
+	/**
+	 * Adds new {@link Component}s of the specified types to the specified {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} to which the {@link Component}s should be added.
+	 * @param componentTypes The types of {@link Component}s that should be added.
+	 * @throws IllegalArgumentException When the specified {@link Entity} was not part of this
+	 * 		{@link EntityManager} or if a new instance of one of the specified types of
+	 * 		{@link Component}s could not be constructed.
+	 * @throws ComponentAlreadyExistsException when one of the {@link Component}s which should be
+	 * 		added is already part of the {@link Entity}.
+	 */
+	public void addComponents(Entity entity, ComponentType... componentTypes)
+			throws IllegalArgumentException, ComponentAlreadyExistsException {
+		int eId = entity.getId();
+		// try to get the list of all components for the specified entity
+		IndexedCollection<Component> ec = _components.get(eId);
+		if (ec == null)
+			throw new IllegalArgumentException();
+		
+		for (ComponentType componentType : componentTypes) {
+			int cId = componentType.getId();
+			// check if there is already a component of the same type
+			if (ec.get(cId) != null)
+				throw new ComponentAlreadyExistsException();
+			// try to get the factory which constructs components of the specified type
+			ComponentFactory fac = _factories.get(cId);
+			if (fac == null)
+				throw new IllegalArgumentException();
+			
+			Component c = fac.createNewComponent();
+			ec.set(cId, c);
+			c.bind(entity);
+			_componentMasks.get(eId).add(componentType);
+		}
+	}
+	
+	public Component getComponent(Entity entity, ComponentType type) {
+		int eId = entity.getId();
+		IndexedCollection<Component> ec = _components.get(eId);
+		if (ec == null)
+			throw new IllegalArgumentException();
+		return ec.get(type.getId());
+	}
+
+	public boolean removeComponent(Entity entity, ComponentType componentType) {
+		int eId = entity.getId();
+		IndexedCollection<Component> ec = _components.get(eId);
+		if (ec == null)
+			throw new IllegalArgumentException();
+		if (ec.remove(componentType.getId())) {
+			_componentMasks.get(eId).remove(componentType);
+			return true;
+		}
+		return false;
+	}
+	
+	public ComponentMask getComponentMask(Entity entity) {
+		return _componentMasks.get(entity.getId());
 	}
 }

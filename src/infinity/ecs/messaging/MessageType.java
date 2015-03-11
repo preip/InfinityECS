@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 /**
  * MessageTypes act as unique identifiers for every type of {@link Message}, by which they can
- * be distinguished. MessageTypes therefore also act as the basis for MessageMask.
+ * be distinguished.
  * 
  * @author preip
  */

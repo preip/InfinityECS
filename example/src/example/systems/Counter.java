@@ -11,13 +11,13 @@ import java.util.Iterator;
 public class Counter extends EntitySystem{
     
     private final EntityManager _manager;
-    private final ReadOnlyCollection<Entity> _entities;
+    private ReadOnlyCollection<Entity> _entities;
     private final ComponentType _counterComponentType; 
     
     public Counter(ComponentMask mask) {
 	super(mask);
-	_manager = EntityManager.getEntityManager();
-	_entities = _manager.getMatchingEntities(_mask);
+	_manager = new EntityManager();
+	//_entities = _manager.getMatchingEntities(_mask);
 	_counterComponentType = ComponentType.get(CounterComponent.class);
     }
     

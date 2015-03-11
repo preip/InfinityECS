@@ -83,9 +83,9 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Add the list of specified {@link ComponentTypes} to this mask.
+	 * Add the list of specified {@link ComponentType}s to this mask.
 	 * 
-	 * @param componentTypes The list of {@link ComponentTypes} that should be added.
+	 * @param componentTypes The list of {@link ComponentType}s that should be added.
 	 */
 	final void add(Collection<ComponentType> componentTypes) {
 		Iterator<ComponentType> iter = componentTypes.iterator();
@@ -94,9 +94,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Add the list of specified {@link ComponentTypes} to this mask.
+	 * Add the list of specified {@link ComponentType}s to this mask.
 	 * 
-	 * @param componentTypes The list of {@link ComponentTypes} that should be added.
+	 * @param componentTypes The list of {@link ComponentType}s that should be added.
 	 */
 	final void add(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
@@ -104,9 +104,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Removed the list of specified {@link ComponentTypes} from this mask.
+	 * Removed the list of specified {@link ComponentType}s from this mask.
 	 * 
-	 * @param componentTypes The list of {@link ComponentTypes} that should be removed.
+	 * @param componentTypes The list of {@link ComponentType}s that should be removed.
 	 */
 	final void remove(Collection<ComponentType> componentTypes) {
 		Iterator<ComponentType> iter = componentTypes.iterator();
@@ -115,9 +115,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Removed the list of specified {@link ComponentTypes} from this mask.
+	 * Removed the list of specified {@link ComponentType}s from this mask.
 	 * 
-	 * @param componentTypes The list of {@link ComponentTypes} that should be removed.
+	 * @param componentTypes The list of {@link ComponentType}s that should be removed.
 	 */
 	final void remove(ComponentType... componentTypes) {
 		for (ComponentType componentType : componentTypes)
@@ -129,9 +129,9 @@ public class ComponentMask {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Checks, if the {@link ComponentMask} contains all specified {@link ComponentType}.
+	 * Checks, if the {@link ComponentMask} contains all specified {@link ComponentType}s.
 	 * 
-	 * @param componentTypes The {@link ComponentType} which should be checked.
+	 * @param componentTypes The {@link ComponentType}s which should be checked.
 	 * @return true if the mask contains all specified types, otherwise false.
 	 */
 	public boolean contains(ComponentType... componentTypes) {
@@ -152,10 +152,10 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Checks if these  {@link ComponentType} contains at least one of the types in the specified
+	 * Checks if these {@link ComponentType}s contains at least one of the types in the specified
 	 * list.
 	 * 
-	 * @param componentTypes The ComponentTypes that should be checked.
+	 * @param componentTypes The {@link ComponentType} that should be checked.
 	 * @return True if this mask contains a least one of the types in the specified list,
 	 * otherwise false.
 	 */
@@ -179,9 +179,9 @@ public class ComponentMask {
 	}
 	
 	/**
-	 * Gets a list of all {@link ComponentType} that are part of the mask.
+	 * Gets a list of all {@link ComponentType}s that are part of the mask.
 	 * 
-	 * @return The list of all {@link ComponentType}.
+	 * @return The list of all {@link ComponentType}s.
 	 */
 	public List<ComponentType> getComponentTypes() {
 		ArrayList<ComponentType> result = new ArrayList<ComponentType>();

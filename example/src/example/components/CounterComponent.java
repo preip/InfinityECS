@@ -9,8 +9,7 @@ public class CounterComponent extends Component {
     
     public int counter;
     
-    public CounterComponent(Entity entity) throws IllegalStateException {
-	super(entity);
-	counter = 0;
-    } 
+    public CounterComponent() {
+    	counter = 0;
+	} 
 }

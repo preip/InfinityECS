@@ -11,17 +11,22 @@ public abstract class Component {
 	/**
 	 * The {@link Entity} which this {@link Component} is part of.
 	 */
-	protected final Entity _entity;
+	private Entity _entity;
 	
 	/**
 	 * Creates a new instance of the {@link Component} class.
-	 * 
-	 * @param entity The {@link Entity} which this {@link Component} is part of.
-	 * @throws IllegalStateException when the entity is <i>null</i>.
 	 */
-	protected Component(Entity entity) throws IllegalStateException {
-		if (entity == null)
-			throw new IllegalStateException();
+	protected Component() {
+		_entity = null;
+	}
+	
+	/**
+	 * Binds this {@link Component} to the specified {@link Entity}.
+	 * Package private, should only be called by the {@link EntityManager}.
+	 * 
+	 * @param entity The {@link Entity} this {@link Component} should be bound to.
+	 */
+	void bind(Entity entity) {
 		_entity = entity;
 	}
 	

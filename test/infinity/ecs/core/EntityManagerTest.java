@@ -5,8 +5,6 @@
  */
 package infinity.ecs.core;
 
-import infinity.ecs.exceptions.EntityDoesNotExistsException;
-import infinity.ecs.utils.ReadOnlyCollection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +24,7 @@ public class EntityManagerTest {
     
     @Before
     public void setUp() {
-	_manager = EntityManager.getEntityManager();
+	_manager = new EntityManager();
 	_entity = _manager.createEntity();
 	_entity2 = _manager.createEntity();
     }
@@ -38,23 +36,15 @@ public class EntityManagerTest {
     }
 
     /**
-     * Test of getEntityManager method, of class EntityManager.
-     */
-    @Test
-    public void testGetEntityManager() {
-	assertTrue("The EntityManager is not a singleton",_manager.equals(EntityManager.getEntityManager()));
-    }
-
-    /**
      * Test of addChildEntity method, of class EntityManager.
      */
     @Test
     public void testAddNestedEntity() {
-	assertFalse("Should not be nested",_entity2.isChild());
+	assertFalse("Should not be nested",_entity2.hasParent());
 	try{
 	    _entity.addChildEntity(_entity2);
-	    assertFalse("Should not be nested",_entity.isChild());
-	    assertTrue("Should be nested",_entity2.isChild());
+	    assertFalse("Should not be nested",_entity.hasParent());
+	    assertTrue("Should be nested",_entity2.hasParent());
 	} catch (Exception e) {
 	    fail("Couldnt add a nested Entity");
 	}
@@ -90,15 +80,4 @@ public class EntityManagerTest {
     public void testAddComponents_Entity_ComponentArr() throws Exception {
 	//TODO: Implement
     }
-
-    /**
-     * Test of getMatchingEntities method, of class EntityManager.
-     */
-    @Test
-    public void testGetMatchingEntities() {
-	ComponentMask componentMask = _entity.getComponentMask();
-	ReadOnlyCollection<Entity> entities = _manager.getMatchingEntities(componentMask);
-	assertTrue("The Entity should be part of the collection", entities.contains(_entity));
-    }
-    
 }

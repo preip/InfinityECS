@@ -28,7 +28,7 @@ public class ReadOnlyMapTest {
     
     @Before
     public void setUp() {
-	_manager = EntityManager.getEntityManager();
+	_manager = new EntityManager();
 	_hashmap = new HashMap<>();
 	_entity = _manager.createEntity();
 	_hashmap.put(_entity.getId(), _entity);
