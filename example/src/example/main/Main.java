@@ -41,19 +41,18 @@ public class Main {
 	ComponentType type = ComponentType.get(CounterComponent.class);
 	ComponentMask mask = new ComponentMask(type);
 	
-	EntityManager manager = EntityManager.getEntityManager();
+	EntityManager manager = new EntityManager();
 	Entity entity = manager.createEntity();
-	CounterComponent component = new CounterComponent(entity);
+	CounterComponent component = null;
 	Scheduler scheduler = new RRScheduler();
 	
 	Main main = new Main();
 
 	try{ 
-	    manager.addComponents(entity, component);
+		component = (CounterComponent) manager.addComponent(entity,
+				ComponentType.get(CounterComponent.class));
 	}
-	catch(Exception e){
-	    
-	}
+	catch(Exception e) { }
 	
 	Counter counter = new Counter(mask);
 	scheduler.registerSystem(counter, 1);
