@@ -12,18 +12,20 @@ import java.util.Iterator;
 public class CounterSystem extends EntitySystem{
     
     private EntityManager _manager;
-    private ReadOnlyCollection<Entity> _entities;
+    private ReadOnlyCollection<Entity> _allEntities;
     private final ComponentType _counterComponentType; 
+    private boolean _isInitialized;
     
     public CounterSystem(ComponentMask mask) {
 	super(mask);
-	//_entities = _manager.getMatchingEntities(_mask);
 	_counterComponentType = ComponentType.get(CounterComponent.class);
     }
     
     @Override
-    public void initialize() {
-	Iterator<Entity> iter = _entities.iterator();
+    public void initialize(EntityManager manager, MessageDispatcher dispatcher) {
+	_manager = manager;
+	_allEntities = _manager.getEntitiesByMask(_mask);
+	Iterator<Entity> iter = _allEntities.iterator();
 	while(iter.hasNext()) {
 	    Entity tempEntity = iter.next();
 	    CounterComponent count;
@@ -34,7 +36,7 @@ public class CounterSystem extends EntitySystem{
     
     @Override
     public void update(int elapsedTime){
-	Iterator<Entity> iter = _entities.iterator();
+	Iterator<Entity> iter = _allEntities.iterator();
 	while(iter.hasNext()) {
 	    Entity tempEntity = iter.next();
 	    CounterComponent count;
@@ -43,16 +45,10 @@ public class CounterSystem extends EntitySystem{
 	}
     }
     
-    @Override
-    public void terminate(){
+    public boolean isInitialized(){
+	return _isInitialized;	
     }
     
     @Override
-    public void setManager(EntityManager manager) {
-	_manager = manager;
-    }
-    
-    @Override
-    public void setDispatcher(MessageDispatcher dispatcher){}
-    
+    public void terminate(){}
 }

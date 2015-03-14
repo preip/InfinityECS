@@ -14,6 +14,7 @@ public class EndSystem extends EntitySystem{
     
     private int _runs;
     private final Scheduler _scheduler;
+    private boolean _isInitialized;
     
     public EndSystem(ComponentMask mask, int runs,Scheduler scheduler){
 	super(mask);
@@ -35,12 +36,12 @@ public class EndSystem extends EntitySystem{
     }
     
     @Override
-    public void initialize(){}
+    public boolean isInitialized(){
+	return _isInitialized;
+    }
     
     @Override
-    public void setManager(EntityManager manager){}
-    
-    @Override
-    public void setDispatcher(MessageDispatcher dispatcher){}
-    
+    public void initialize(EntityManager manager, MessageDispatcher dispatcher){
+	_isInitialized = true;
+    }
 }

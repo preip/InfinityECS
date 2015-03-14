@@ -4,6 +4,6 @@ package example.stuff;
  *
  * @author Simon
  */
-public class Item {
+public abstract class Item {
     
 }

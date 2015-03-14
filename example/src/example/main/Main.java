@@ -62,7 +62,7 @@ public class Main {
 	}
 	System.out.println(main.getSchedule(scheduler));
 	
-	counter.initialize();
+	counter.initialize(manager,null);
 	counter.update(100);
 	
 	System.out.println(component.counter);

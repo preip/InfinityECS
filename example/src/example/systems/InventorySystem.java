@@ -16,6 +16,7 @@ public class InventorySystem extends EntitySystem {
     private IndexedCollection<Entity> _allEntities;
     private EntityManager _manager;
     private MessageDispatcher _dispatcher;
+    private boolean _isInitialized;
     
     public InventorySystem(ComponentMask mask){
 	super(mask);
@@ -30,16 +31,14 @@ public class InventorySystem extends EntitySystem {
     public void terminate(){}
     
     @Override
-    public void initialize(){
-    }
-    
-    @Override
-    public void setManager(EntityManager manager){
+    public void initialize(EntityManager manager, MessageDispatcher dispatcher){
 	_manager = manager;
+	_dispatcher = dispatcher;
+	_isInitialized = true;
     }
     
     @Override
-    public void setDispatcher(MessageDispatcher dispatcher){
-	_dispatcher = dispatcher;
+    public boolean isInitialized(){
+	return _isInitialized;
     }
 }
