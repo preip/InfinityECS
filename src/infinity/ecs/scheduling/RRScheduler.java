@@ -83,7 +83,7 @@ public class RRScheduler implements Scheduler{
      * Registers the system in the Scheduler.
      * @param system
      * @param priority The priority of each System must be unique, if a second system with the same 
-     * priority is registered nothing happens. The highest priority is 1. The priority must be >0
+     * priority is registered nothing happens. The highest priority is 1. The priority must be &#62; 0
      * @return  
      */
     @Override

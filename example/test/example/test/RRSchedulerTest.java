@@ -1,4 +1,4 @@
-package infinity.ecs.scheduling;
+package example.test;
 
 import example.components.CounterComponent;
 import example.systems.Counter;
@@ -8,6 +8,8 @@ import infinity.ecs.core.Entity;
 import infinity.ecs.core.EntityManager;
 import infinity.ecs.core.EntitySystem;
 import infinity.ecs.exceptions.ScheduleIsRunningException;
+import infinity.ecs.scheduling.RRScheduler;
+import infinity.ecs.scheduling.Scheduler;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import org.junit.Before;
@@ -35,20 +37,20 @@ public class RRSchedulerTest {
     public void setUp() {
 	_type = ComponentType.get(CounterComponent.class);
 	_mask = new ComponentMask(_type);
-	_manager = EntityManager.getEntityManager();
+	_manager = new EntityManager();
 	_entity1 = _manager.createEntity();
 	_entity2 = _manager.createEntity();
-	_component1 = new CounterComponent(_entity1);
-	_component2 = new CounterComponent(_entity2);
 	
 	try{ 
-	    _manager.addComponents(_entity1, _component1);
-	    _manager.addComponents(_entity2, _component2);
+	    _manager.addComponents(_entity1, _type);
+	    _manager.addComponents(_entity2, _type);
 	}
 	catch(Exception e){
 	    fail("Coulnt add Component to an Entity");
 	}
 	
+	_component1 = (CounterComponent) _manager.getComponent(_entity1, _type);
+	_component2 = (CounterComponent) _manager.getComponent(_entity2, _type);
 	_counter1 = new Counter(_mask);
 	_counter2 = new Counter(_mask);
 	_scheduler = new RRScheduler();
