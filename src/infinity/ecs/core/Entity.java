@@ -16,7 +16,7 @@ public final class Entity {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * The unique id of the Entity.
+	 * The unique id of the {@link Entity}.
 	 */
 	private final int _id;
 
@@ -27,10 +27,10 @@ public final class Entity {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
-	 * Package private constructor, which initializes the entity with the 
-	 * specified id. Can't be public, or IDs were no longer be guaranteed 
-	 * to be unique
-	 * @param id The unique id of the entity.
+	 * Package private constructor, which initializes the {@link Entity} with the  specified id.
+	 * Can't be public, or IDs were no longer be guaranteed to be unique.
+	 * 
+	 * @param id The unique id of the {@link Entity}.
 	 */
 	Entity(int id, EntityManager em) {
 		_id = id;
@@ -42,8 +42,9 @@ public final class Entity {
 	//----------------------------------------------------------------------------------------------
 	
 	/**
+	 * Gets the unique ID of this {@link Entity}.
 	 * 
-	 * @return the unique ID of the Entity.
+	 * @return the unique ID of the {@link Entity}.
 	 */
 	public int getId() {
 		return _id;
@@ -53,11 +54,27 @@ public final class Entity {
 	// Component related methods
 	//----------------------------------------------------------------------------------------------
 	
+	/**
+	 * Add the {@link Component} with the specified {@link ComponentType} to this {@link Entity}.
+	 * 
+	 * @param componentType The type of the {@link Component} which should be added.
+	 * @return The {@link Component} which has been added. 
+	 * @throws IllegalArgumentException
+	 * @throws ComponentAlreadyExistsException
+	 */
 	public Component addComponent(ComponentType componentType)
 			throws IllegalArgumentException, ComponentAlreadyExistsException {
 		return _em.addComponent(this, componentType);
 	}
 	
+	/**
+	 * Add a list of {@link Component}s defined by the specified list of {@link ComponentType}s
+	 * to this {@link Entity}. 
+	 * 
+	 * @param componentTypes The list of {@link ComponentTypes} which should be added.
+	 * @throws IllegalArgumentException
+	 * @throws ComponentAlreadyExistsException
+	 */
 	public void addComponents(ComponentType... componentTypes)
 			throws IllegalArgumentException, ComponentAlreadyExistsException {
 		_em.addComponents(this, componentTypes);
@@ -122,7 +139,7 @@ public final class Entity {
 	 * @param child The child that should be removed.
 	 */
 	public boolean removeChildEntity(Entity child) {
-	    return _em.removeChildEntity(this, child);
+	    return _em.removeChildEntity(child);
 	}
 	
 	/**

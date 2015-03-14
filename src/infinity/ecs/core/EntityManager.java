@@ -32,8 +32,18 @@ public class EntityManager {
 	 */
 	private final IndexedCollection<Entity> _entities;
 	
+	/**
+	 * The list of all Parent-{@link Entity}s of all the registered {@link Entity}s indexed by
+	 * their IDs. Every registered entity gets an entry in this list. If the {@link Entity} is null,
+	 * the {@link Entity} has no parent, otherwise the list contains a reference to the parent. 
+	 */
 	private final IndexedCollection<Entity> _parents;
 	
+	/**
+	 * The list of the children of all registered {@link Entity}s indexed by the IDs of their
+	 * parents. Every registered {@link Entity} gets an entry in this list. The entries itself
+	 * are also lists, which contain references to the children of the corresponding {@link Entity}.
+	 */
 	private final IndexedCollection<List<Entity>> _children;
 	
 	/**
@@ -42,8 +52,17 @@ public class EntityManager {
 	 */
 	private final IndexedCollection<IndexedCollection<Component>> _components;
 	
+	/**
+	 * The list of the {@link ComponentMask}s of all registered {@link Entity}s indexed by the
+	 * IDs of the {@link Entity}s.
+	 */
 	private final IndexedCollection<ComponentMask> _componentMasks;
 	
+	/**
+	 * The list of all registered {@link ComponentFactory}s indexed by the id of the type of
+	 * {@link Component} they construct. The content of this list determines which
+	 * {@link Component}s can be added to {@link Entity}s.
+	 */
 	private final IndexedCollection<ComponentFactory> _factories;
 
 	//----------------------------------------------------------------------------------------------
@@ -95,7 +114,9 @@ public class EntityManager {
 	}
 	
 	/**
-	 * Removes the specified {@link Entity} from this {@link EntityManager}.
+	 * Removes the specified {@link Entity} from this {@link EntityManager} and also all
+	 * Child-{@link Entity}s of the specified {@link Entity}.
+	 * 
 	 * @param entity The {@link Entity} which should be removed.
 	 * @return true if the {@link Entity} was removed, otherwise false.
 	 */
@@ -104,10 +125,31 @@ public class EntityManager {
 		if (_entities.remove(eId)) {
 			_components.remove(eId);
 			_componentMasks.remove(eId);
-			// TODO: Remove all children too
+			for (Entity child : _children.get(eId))
+				removeEntity(child);
+			_children.set(eId, null);
+			if (_parents.remove(eId)) {
+				List<Entity> tChilds = _children.get(eId);
+				tChilds.remove(eId);
+			}
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Gets a list of all {@link Entity}s that contain the {@link Component}s defined by the
+	 * specified {@link ComponentMask}.
+	 * 
+	 * @param mask The {@link ComponentMask} which defines the desired {@link Entity}s.
+	 * @return A list of all relevant {@link Entity}s.
+	 */
+	public ReadOnlyCollection<Entity> getEntitiesByMask(ComponentMask mask) {
+		List<Entity> result = new ArrayList<Entity>();
+		for (Entity entity : _entities)
+			if (entity.getComponentMask().contains(mask))
+				result.add(entity);
+		return new ReadOnlyCollection<Entity>(result);
 	}
 		
 	//----------------------------------------------------------------------------------------------
@@ -124,24 +166,42 @@ public class EntityManager {
 	 */
 	public void addChildEntity(Entity parent, Entity child)
 			throws IllegalArgumentException, AlreadyNestedException {
+		// check for null and also make sure nobody tries to add the entity to itself
+		if (parent == null || child == null || child == parent)
+			throw new IllegalArgumentException();
+		// check if the entity is registered in the entity manager and try to get the list of
+		// all the children it currently has
 		List<Entity> tChilds = _children.get(parent.getId());
 		if (tChilds == null)
 			throw new IllegalArgumentException();
+		// check if the child already has a parent
 		if (_parents.get(child.getId()) != null)
 			throw new AlreadyNestedException();
+		// check if the child is in truth a parent of the 'parent'
+		Entity parentOfParent = _parents.get(parent.getId());
+		while (parentOfParent != null)
+		{
+			if (parentOfParent == child)
+				throw new IllegalArgumentException();
+			parentOfParent = _parents.get(parentOfParent.getId());
+		}
+		// finally add the child to the parent
 		tChilds.add(child);
 		_parents.set(child.getId(), parent);
 	}
 	
 	/**
-	 * Removes a nested Entity from a super Entity, adds the nested Entity to _parentEntities and
-	 * _superEntititesByMask.
+	 * Removes the specified Child-{@link Entity} from it's current Parent-{@link Entity}.
+	 * This does not remove the Child-{@link Entity} itself, it only detaches the child from it's
+	 * parent. If you want to remove the whole {@link Entity}, use <i>removeEntity</i> instead.
 	 * 
-	 * @param parentEntity
-	 * @param childEntity 
+	 * @param child The Child-{@link Entity} that should be removed from it's parent. 
 	 */
-	public boolean removeChildEntity(Entity parent, Entity child)
+	public boolean removeChildEntity(Entity child)
 			throws IllegalArgumentException {
+		Entity parent = _parents.get(child.getId());
+		if (parent == null)
+			return false;
 		List<Entity> tChilds = _children.get(parent.getId());
 		if (tChilds == null)
 			throw new IllegalArgumentException();
@@ -152,10 +212,23 @@ public class EntityManager {
 		return false;
 	}
 	
+	/**
+	 * Gets the Parent-{@link Entity} of the specified {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} which parent should be got.
+	 * @return The parent of the specified {@link Entity} or null if the {@link Entity} has no
+	 * 		parent.
+	 */
 	public Entity getParent(Entity entity) {
 		return _parents.get(entity.getId());
 	}
 	
+	/**
+	 * Gets a read only list of all Child-{@link Entity}s of the specified {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} which children should be got.
+	 * @return The list of all Child-{@link Entity}s.
+	 */
 	public ReadOnlyCollection<Entity> getChildren(Entity entity) {
 		List<Entity> tChilds = _children.get(entity.getId());
 		if (tChilds == null)
@@ -255,7 +328,19 @@ public class EntityManager {
 		}
 	}
 	
-	public Component getComponent(Entity entity, ComponentType type) {
+	/**
+	 * Gets the {@link Component} with the specified {@link ComponentType}  from the specified
+	 * {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} which {@link Component} should be got.
+	 * @param type The {@link ComponentType} of the {@link Component} which should be got.
+	 * @return The desired {@link Component} or null if the type of {@link Component} was not part
+	 * 		of the entity.
+	 * @throws IllegalArgumentException When the {@link Entity} was not part of this
+	 * 		{@link EntityManager}.
+	 */
+	public Component getComponent(Entity entity, ComponentType type)
+			throws IllegalArgumentException {
 		int eId = entity.getId();
 		IndexedCollection<Component> ec = _components.get(eId);
 		if (ec == null)
@@ -263,6 +348,17 @@ public class EntityManager {
 		return ec.get(type.getId());
 	}
 
+	/**
+	 * Removes the {@link Component} with the specified {@link ComponentType} from the specified
+	 * {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} which {@link Component} should be removed.
+	 * @param componentType The {@link ComponentType} of the {@link Component} which should be
+	 * 		removed.
+	 * @return true if the {@link Component} was removed, otherwise false.
+	 * @throws IllegalArgumentException When the {@link Entity} was not part of this
+	 * 		{@link EntityManager}.
+	 */
 	public boolean removeComponent(Entity entity, ComponentType componentType) {
 		int eId = entity.getId();
 		IndexedCollection<Component> ec = _components.get(eId);
@@ -275,6 +371,12 @@ public class EntityManager {
 		return false;
 	}
 	
+	/**
+	 * Gets the {@link ComponentMask} of the specified {@link Entity}.
+	 * 
+	 * @param entity The {@link Entity} which {@link ComponentMask} should be got.
+	 * @return The {@link ComponentMask} of the {@link Entity}.
+	 */
 	public ComponentMask getComponentMask(Entity entity) {
 		return _componentMasks.get(entity.getId());
 	}
