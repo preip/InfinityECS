@@ -137,8 +137,8 @@ public class EntityManager {
 	 * Removes a nested Entity from a super Entity, adds the nested Entity to _parentEntities and
 	 * _superEntititesByMask.
 	 * 
-	 * @param parentEntity
-	 * @param childEntity 
+	 * @param parent
+	 * @param child
 	 */
 	public boolean removeChildEntity(Entity parent, Entity child)
 			throws IllegalArgumentException {

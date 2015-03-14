@@ -1,6 +1,7 @@
 package example.systems;
 import example.components.CounterComponent;
 import infinity.ecs.core.*;
+import infinity.ecs.messaging.MessageDispatcher;
 import infinity.ecs.utils.ReadOnlyCollection;
 import java.util.Iterator;
 
@@ -8,15 +9,14 @@ import java.util.Iterator;
  *
  * @author Simon
  */
-public class Counter extends EntitySystem{
+public class CounterSystem extends EntitySystem{
     
-    private final EntityManager _manager;
+    private EntityManager _manager;
     private ReadOnlyCollection<Entity> _entities;
     private final ComponentType _counterComponentType; 
     
-    public Counter(ComponentMask mask) {
+    public CounterSystem(ComponentMask mask) {
 	super(mask);
-	_manager = new EntityManager();
 	//_entities = _manager.getMatchingEntities(_mask);
 	_counterComponentType = ComponentType.get(CounterComponent.class);
     }
@@ -46,5 +46,13 @@ public class Counter extends EntitySystem{
     @Override
     public void terminate(){
     }
+    
+    @Override
+    public void setManager(EntityManager manager) {
+	_manager = manager;
+    }
+    
+    @Override
+    public void setDispatcher(MessageDispatcher dispatcher){}
     
 }

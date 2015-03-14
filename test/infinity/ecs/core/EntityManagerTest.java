@@ -5,6 +5,7 @@
  */
 package infinity.ecs.core;
 
+import infinity.ecs.exceptions.EntityDoesNotExistsException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,16 +63,16 @@ public class EntityManagerTest {
     /**
      * Test of getEntity method, of class EntityManager.
      */
-    /*@Test
+    @Test
     public void testGetEntity() throws Exception {
-	assertTrue("", _entity == _manager.getEntity(_entity.getId()));
+	assertTrue(_entity == _manager.getEntity(_entity.getId()));
 	try {
 	    _entity = _manager.getEntity(100000);
 	    fail("getEntity should throw an Exception");
 	} catch (EntityDoesNotExistsException e) {
 	    
 	}
-    }*/
+    }
 
     /**
      * Test of addComponents method, of class EntityManager.

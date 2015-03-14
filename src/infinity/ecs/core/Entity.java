@@ -108,7 +108,7 @@ public final class Entity {
 	/**
 	 * Adds the specified child to this entity.
 	 * 
-	 * @param childEntity The child that should be added.
+	 * @param child The child that should be added.
 	 * @throws AlreadyNestedException Is thrown when nestedEntity is already nested.
 	 * @throws IllegalArgumentException When the entity is added as a child to itself.
 	 */
