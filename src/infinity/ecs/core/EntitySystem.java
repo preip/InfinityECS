@@ -1,5 +1,7 @@
 package infinity.ecs.core;
 
+import infinity.ecs.messaging.MessageDispatcher;
+
 public abstract class EntitySystem {
 	
 	/**
@@ -44,4 +46,16 @@ public abstract class EntitySystem {
 	 * Frees all resources that are used by the system. 
 	 */
 	public abstract void terminate();
+	
+	/**
+	 * Sets the {@link EntityManager} for this system.
+	 * @param manager 
+	 */
+	public abstract void setManager(EntityManager manager);
+	
+	/**
+	 * Sets the {@link MessageDispatcher} for this systems
+	 * @param dispatcher 
+	 */
+	public abstract void setDispatcher(MessageDispatcher dispatcher);
 }

@@ -1,7 +1,7 @@
 package example.main;
 
 import example.components.CounterComponent;
-import example.systems.Counter;
+import example.systems.CounterSystem;
 import infinity.ecs.core.ComponentMask;
 import infinity.ecs.core.ComponentType;
 import infinity.ecs.core.Entity;
@@ -54,7 +54,7 @@ public class Main {
 	}
 	catch(Exception e) { }
 	
-	Counter counter = new Counter(mask);
+	CounterSystem counter = new CounterSystem(mask);
 	scheduler.registerSystem(counter, 1);
 	try{
 	    scheduler.makeSchedule();

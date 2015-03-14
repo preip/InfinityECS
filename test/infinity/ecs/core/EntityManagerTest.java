@@ -9,6 +9,7 @@ import infinity.ecs.exceptions.EntityDoesNotExistsException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -25,30 +26,15 @@ public class EntityManagerTest {
     
     @Before
     public void setUp() {
-	_manager = new EntityManager();
-	_entity = _manager.createEntity();
-	_entity2 = _manager.createEntity();
+		_manager = new EntityManager();
+		_entity = _manager.createEntity();
+		_entity2 = _manager.createEntity();
     }
     
     @After
     public void tearDown() {
-	_manager = null;
-	_entity = null;
-    }
-
-    /**
-     * Test of addChildEntity method, of class EntityManager.
-     */
-    @Test
-    public void testAddNestedEntity() {
-	assertFalse("Should not be nested",_entity2.hasParent());
-	try{
-	    _entity.addChildEntity(_entity2);
-	    assertFalse("Should not be nested",_entity.hasParent());
-	    assertTrue("Should be nested",_entity2.hasParent());
-	} catch (Exception e) {
-	    fail("Couldnt add a nested Entity");
-	}
+		_manager = null;
+		_entity = null;
     }
 
     /**
@@ -56,22 +42,52 @@ public class EntityManagerTest {
      */
     @Test
     public void testCreateEntity() {
-	_entity = _manager.createEntity();
-	assertFalse("Those Entities should not be the same.", _entity == _entity2);
+    	_entity = _manager.createEntity();
+    	assertFalse("Those Entities should not be the same.", _entity == _entity2);
     }
-
-    /**
-     * Test of getEntity method, of class EntityManager.
-     */
+    
     @Test
-    public void testGetEntity() throws Exception {
-	assertTrue(_entity == _manager.getEntity(_entity.getId()));
-	try {
-	    _entity = _manager.getEntity(100000);
-	    fail("getEntity should throw an Exception");
-	} catch (EntityDoesNotExistsException e) {
-	    
-	}
+    public void addChildEntity() {
+    	try {
+    		_manager.addChildEntity(_entity, _entity);
+    		fail("Entities can not be nested in itself");
+    	} catch (Exception e) {
+    		
+    	}
+    	
+    	
+    	try {
+			_manager.addChildEntity(_entity, _entity2);
+			assertFalse("Should not have a parent", _entity.hasParent());
+		    assertTrue("Should have a parent", _entity2.hasParent());
+		} catch (Exception e) {
+			fail("Couldnt add a child Entity");
+		}
+    	try {
+			_manager.addChildEntity(_entity, _entity2);
+			fail("Children that already have a parent can't be added as a children");
+		} catch (Exception e) {
+
+		}
+    	
+    	_manager.removeChildEntity(_entity2);
+    	assertFalse("Should not have a parent",_entity.hasParent());
+	    assertFalse("Should have a parent",_entity2.hasParent());
+    	
+    	Entity entity3 = _manager.createEntity();
+    	try {
+    		_manager.addChildEntity(entity3, _entity);
+    		_manager.addChildEntity(_entity2, entity3);
+    	} catch (Exception e) {
+			fail("Couldnt add a child Entity");
+		}
+    	
+    	try {
+    		_manager.addChildEntity(_entity, _entity2);
+    		fail("Entites can not contain children that are in truth their parents");
+    	} catch (Exception e) {
+    		
+    	}
     }
 
     /**
@@ -79,6 +95,6 @@ public class EntityManagerTest {
      */
     @Test
     public void testAddComponents_Entity_ComponentArr() throws Exception {
-	//TODO: Implement
+    	//TODO: Implement
     }
 }

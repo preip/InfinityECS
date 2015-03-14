@@ -1,7 +1,7 @@
 package example.test;
 
 import example.components.CounterComponent;
-import example.systems.Counter;
+import example.systems.CounterSystem;
 import infinity.ecs.core.ComponentMask;
 import infinity.ecs.core.ComponentType;
 import infinity.ecs.core.Entity;
@@ -26,7 +26,7 @@ public class RRSchedulerTest {
     private ComponentType _type;
     private ComponentMask _mask;
     private Entity _entity1,_entity2;
-    private Counter _counter1, _counter2;
+    private CounterSystem _counter1, _counter2;
     private CounterComponent _component1, _component2;
     private RRScheduler _scheduler;
     
@@ -51,8 +51,8 @@ public class RRSchedulerTest {
 	
 	_component1 = (CounterComponent) _manager.getComponent(_entity1, _type);
 	_component2 = (CounterComponent) _manager.getComponent(_entity2, _type);
-	_counter1 = new Counter(_mask);
-	_counter2 = new Counter(_mask);
+	_counter1 = new CounterSystem(_mask);
+	_counter2 = new CounterSystem(_mask);
 	_scheduler = new RRScheduler();
     }
 
