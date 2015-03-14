@@ -1,7 +1,9 @@
 package example.systems;
 
 import infinity.ecs.core.ComponentMask;
+import infinity.ecs.core.EntityManager;
 import infinity.ecs.core.EntitySystem;
+import infinity.ecs.messaging.MessageDispatcher;
 import infinity.ecs.scheduling.Scheduler;
 
 /**
@@ -35,8 +37,10 @@ public class EndSystem extends EntitySystem{
     @Override
     public void initialize(){}
     
-    public void setManager(EntityManger manager){}
+    @Override
+    public void setManager(EntityManager manager){}
     
+    @Override
     public void setDispatcher(MessageDispatcher dispatcher){}
     
 }
