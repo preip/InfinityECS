@@ -3,6 +3,14 @@ package infinity.ecs.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import infinity.ecs.messaging.ChildEntityAddedMessage;
+import infinity.ecs.messaging.ChildEntityRemovedMessage;
+import infinity.ecs.messaging.ComponentAddedMessage;
+import infinity.ecs.messaging.ComponentRemovedMessage;
+import infinity.ecs.messaging.EntityCreatedMessage;
+import infinity.ecs.messaging.EntityRemovedMessage;
+import infinity.ecs.messaging.MessageDispatcher;
+import infinity.ecs.messaging.MessageEndpoint;
 import infinity.ecs.utils.IdPool;
 import infinity.ecs.utils.IndexedCollection;
 import infinity.ecs.utils.ReadOnlyCollection;
@@ -64,6 +72,8 @@ public class EntityManager {
 	 * {@link Component}s can be added to {@link Entity}s.
 	 */
 	private final IndexedCollection<ComponentFactory> _factories;
+	
+	private MessageEndpoint _msgEndpoint;
 
 	//----------------------------------------------------------------------------------------------
 	// Constructors
@@ -97,6 +107,9 @@ public class EntityManager {
 		_children.set(id, new ArrayList<Entity>());
 		_components.set(id, new IndexedCollection<Component>());
 		_componentMasks.set(id, new ComponentMask());
+		
+		if (_msgEndpoint != null)
+			_msgEndpoint.send(new EntityCreatedMessage(entity));
 		return entity;
 	}
 	
@@ -132,6 +145,9 @@ public class EntityManager {
 				List<Entity> tChilds = _children.get(eId);
 				tChilds.remove(eId);
 			}
+			
+			if (_msgEndpoint != null)
+				_msgEndpoint.send(new EntityRemovedMessage(entity));
 			return true;
 		}
 		return false;
@@ -188,6 +204,9 @@ public class EntityManager {
 		// finally add the child to the parent
 		tChilds.add(child);
 		_parents.set(child.getId(), parent);
+		
+		if (_msgEndpoint != null)
+			_msgEndpoint.send(new ChildEntityAddedMessage(parent, child));
 	}
 	
 	/**
@@ -207,6 +226,9 @@ public class EntityManager {
 			throw new IllegalArgumentException();
 		if (tChilds.remove(child)) {
 			_parents.remove(child.getId());
+			
+			if (_msgEndpoint != null)
+				_msgEndpoint.send(new ChildEntityRemovedMessage(parent, child));
 			return true;
 		}
 		return false;
@@ -289,6 +311,9 @@ public class EntityManager {
 		ec.set(cId, c);
 		c.bind(entity);
 		_componentMasks.get(eId).add(componentType);
+		
+		if (_msgEndpoint != null)
+			_msgEndpoint.send(new ComponentAddedMessage(c));
 		return c;
 	}
 	
@@ -325,6 +350,9 @@ public class EntityManager {
 			ec.set(cId, c);
 			c.bind(entity);
 			_componentMasks.get(eId).add(componentType);
+			
+			if (_msgEndpoint != null)
+				_msgEndpoint.send(new ComponentAddedMessage(c));
 		}
 	}
 	
@@ -364,11 +392,16 @@ public class EntityManager {
 		IndexedCollection<Component> ec = _components.get(eId);
 		if (ec == null)
 			throw new IllegalArgumentException();
-		if (ec.remove(componentType.getId())) {
-			_componentMasks.get(eId).remove(componentType);
-			return true;
-		}
-		return false;
+		int cId = componentType.getId(); 
+		Component c = ec.get(cId);
+		if (c == null)
+			return false;
+		ec.remove(cId);
+		_componentMasks.get(eId).remove(componentType);
+		
+		if (_msgEndpoint != null)
+			_msgEndpoint.send(new ComponentRemovedMessage(c));
+		return true;
 	}
 	
 	/**
@@ -379,5 +412,24 @@ public class EntityManager {
 	 */
 	public ComponentMask getComponentMask(Entity entity) {
 		return _componentMasks.get(entity.getId());
+	}
+	
+	//----------------------------------------------------------------------------------------------
+	// Message related methods
+	//----------------------------------------------------------------------------------------------
+	
+	/**
+	 * Registers this {@link EntityManager} with the specified {@link MessageDispatcher} and
+	 * terminates the connection to the previously {@link MessageDispatcher} if there is one.
+	 * If the {@link EntityManager} is registered with a dispatcher, it will send notification
+	 * messages whenever a new {@link Entity} was creates, removed, has children added or removed,
+	 * or if {@link Components} were added or removed.  
+	 * 
+	 * @param msgDispatcher
+	 */
+	public void setMessageDispatcher(MessageDispatcher msgDispatcher) {
+		if (_msgEndpoint != null)
+			_msgEndpoint.terminate();
+		_msgEndpoint = msgDispatcher.createEndpoint();
 	}
 }
