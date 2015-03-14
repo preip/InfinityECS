@@ -32,8 +32,19 @@ public abstract class EntitySystem {
 	
 	/**
 	 * Initializes all resources needed by the system.
+	 * 
+	 * @param entityManager The {@link EntityManager} which handles all {@link Entity}s this
+	 * 		system may work with.
+	 * @param msgDispatcher The {@link MessageDispatcher} with which this system can register it's
+	 * 		own {@link MessageEndpoint} to send end receive {@link Message}s. 
 	 */
-	public abstract void initialize();
+	public abstract void initialize(EntityManager entityManager, MessageDispatcher msgDispatcher);
+	
+	/**
+	 * Indicates if this system has been initialized or not. 
+	 * @return
+	 */
+	public abstract boolean isInitialized();
 	
 	/**
 	 * Updates this system.
@@ -46,16 +57,4 @@ public abstract class EntitySystem {
 	 * Frees all resources that are used by the system. 
 	 */
 	public abstract void terminate();
-	
-	/**
-	 * Sets the {@link EntityManager} for this system.
-	 * @param manager 
-	 */
-	public abstract void setManager(EntityManager manager);
-	
-	/**
-	 * Sets the {@link MessageDispatcher} for this systems
-	 * @param dispatcher 
-	 */
-	public abstract void setDispatcher(MessageDispatcher dispatcher);
 }

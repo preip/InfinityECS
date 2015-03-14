@@ -24,7 +24,7 @@ import infinity.ecs.exceptions.EntityDoesNotExistsException;
  * 
  * @author preip, simon
  */
-public class EntityManager {
+public final class EntityManager {
 	
 	//----------------------------------------------------------------------------------------------
 	// Fields

@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * @author preip, Simon
  */
-public class ComponentMask {
+public final class ComponentMask {
 	
 	//----------------------------------------------------------------------------------------------
 	// Fields

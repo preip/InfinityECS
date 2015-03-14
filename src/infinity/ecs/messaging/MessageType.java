@@ -8,7 +8,7 @@ import java.util.HashMap;
  * 
  * @author preip
  */
-public class MessageType {
+public final class MessageType {
 	
 	//----------------------------------------------------------------------------------------------
 	// Static Fields
