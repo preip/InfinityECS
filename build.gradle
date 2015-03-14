@@ -19,7 +19,6 @@ repositories {
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     testCompile 'junit:junit:4.11'
-    testCompile project(":example")
 }
 
 /*
@@ -31,6 +30,7 @@ project(":example") {
     apply plugin: "eclipse"
     
     sourceSets.main.java.srcDirs = ["src/"]
+    sourceSets.test.java.srcDirs = ["test/"]
       
     repositories {
         jcenter()
@@ -39,6 +39,7 @@ project(":example") {
     dependencies {
         compile rootProject
         compile "org.slf4j:slf4j-api:1.7.7"
+        testCompile 'junit:junit:4.11'
     }
     
     eclipse.project {
@@ -67,9 +68,9 @@ project(":benchmark") {
     }
     
     jar{
-	manifest {
-	    attributes('Main-Class' : 'infinity.ecs.benchmark.App')
-	}
+        manifest {
+            attributes('Main-Class' : 'infinity.ecs.benchmark.App')
+        }
     }
     
     eclipse.project {
