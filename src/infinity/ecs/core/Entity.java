@@ -5,9 +5,11 @@ import infinity.ecs.exceptions.ComponentAlreadyExistsException;
 import infinity.ecs.utils.ReadOnlyCollection;
 
 /**
+ * A class that represents a single entity within the game world. The entity is associated with an
+ * specific {@link EntitManager} and has a unique Id. It consist of several {@link Components} which
+ * contain the actual data of the entity and therefore define its type.
  *
  * @author preip, Simon
- * @version 0.1
  */
 public final class Entity {
 	
@@ -19,7 +21,10 @@ public final class Entity {
 	 * The unique id of the {@link Entity}.
 	 */
 	private final int _id;
-
+	
+	/**
+	 * The {@link EntityManager} this entity is associated with.
+	 */
 	private final EntityManager _em;
 	
 	//----------------------------------------------------------------------------------------------

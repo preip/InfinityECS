@@ -8,7 +8,7 @@ import infinity.ecs.core.Entity;
  * 
  * @author preip
  */
-public class ComponentChangedMessage {
+public class ComponentChangedMessage extends Message {
 	
 	/**
 	 * The {@link Component} which was changed.

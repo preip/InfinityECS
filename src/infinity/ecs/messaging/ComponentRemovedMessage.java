@@ -9,7 +9,7 @@ import infinity.ecs.core.Entity;
  * 
  * @author preip
  */
-public class ComponentRemovedMessage {
+public class ComponentRemovedMessage extends Message {
 	
 	/**
 	 * The {@link Component} which was removed.
