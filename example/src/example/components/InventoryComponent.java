@@ -8,12 +8,13 @@ import infinity.ecs.utils.IndexedCollection;
  *
  * @author Simon
  */
-public class InventoryComponent extends Component{
-    
+public class InventoryComponent extends Component {
+
     public IndexedCollection<Item> items;
     public int maxSize;
-    
-    public InventoryComponent(){
-	items = new IndexedCollection<>();
+
+    public InventoryComponent() {
+		items = new IndexedCollection<>();
+		maxSize = 10;
     }
 }

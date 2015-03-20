@@ -43,8 +43,10 @@ public class CounterSystem extends EntitySystem{
 	    count = (CounterComponent)tempEntity.getComponent(_counterComponentType);
 	    count.counter += 1;
 	}
+	_isInitialized = true;
     }
     
+    @Override
     public boolean isInitialized(){
 	return _isInitialized;	
     }
